@@ -1,0 +1,1066 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="data:,">
+<title>第三波·Pro：数字孪生预演增强（Harness 进化版）</title>
+<script src="/static/vendor/tailwind.js"></script>
+<script src="/static/vendor/chart.umd.min.js"></script>
+<style>
+  html{font-size:15px}
+  body{font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif;background:#070d18;color:#e2e8f0}
+  .card{background:#0e1728;border:1px solid #1e293b;border-radius:12px}
+  .tab-btn{padding:9px 16px;border-radius:9px;font-size:15px;color:#94a3b8;cursor:pointer;white-space:nowrap;border:1px solid transparent}
+  .tab-btn:hover{color:#e2e8f0;background:#1e293b}
+  .tab-btn.active{color:#38bdf8;background:#0c4a6e33;border-color:#0ea5e955}
+  .tab-page{display:none}.tab-page.active{display:block}
+  .pill{display:inline-block;padding:2px 12px;border-radius:999px;font-size:13px}
+  .pill-green{background:#064e3b;color:#6ee7b7}.pill-yellow{background:#713f12;color:#fde047}
+  .pill-red{background:#7f1d1d;color:#fca5a5}.pill-blue{background:#1e3a8a;color:#93c5fd}
+  .pill-gray{background:#334155;color:#cbd5e1}
+  .btn{padding:8px 16px;border-radius:8px;font-size:14px;cursor:pointer;border:1px solid #334155;background:#1e293b;color:#e2e8f0}
+  .btn:hover{background:#334155}.btn-primary{background:#0369a1;border-color:#0284c7;color:#fff}
+  .btn-primary:hover{background:#0284c7}.btn-danger{background:#7f1d1d;border-color:#b91c1c}
+  .btn:disabled{opacity:.4;cursor:not-allowed}
+  input[type=range]{width:100%;accent-color:#0ea5e9}
+  .mono{font-family:ui-monospace,Consolas,monospace;font-size:13px}
+  .kv{display:flex;justify-content:space-between;padding:3.5px 0;border-bottom:1px dashed #1e293b;font-size:14px}
+  .kv b{color:#7dd3fc;font-weight:600}
+  .fadein{animation:fi .35s ease}@keyframes fi{from{opacity:0;transform:translateY(6px)}to{opacity:1}}
+  .slidein{animation:si .4s ease}@keyframes si{from{opacity:0;transform:translateX(14px)}to{opacity:1;transform:translateX(0)}}
+  .scrollbox{max-height:330px;overflow-y:auto}
+  .scrollbox::-webkit-scrollbar{width:6px}.scrollbox::-webkit-scrollbar-thumb{background:#334155;border-radius:3px}
+  table.audit{font-size:13px;width:100%;border-collapse:collapse}
+  table.audit th,table.audit td{border:1px solid #1e293b;padding:5px 9px;text-align:left}
+  table.audit th{background:#0f172a;color:#7dd3fc;position:sticky;top:0}
+  /* ===== ICU 监护风格 ===== */
+  .monitor-panel{background:#050b14;border:1px solid #16324a;border-radius:12px;position:relative;overflow:hidden}
+  .monitor-panel::after{content:'';position:absolute;inset:0;pointer-events:none;
+    background:repeating-linear-gradient(0deg,rgba(120,200,255,.025) 0 1px,transparent 1px 3px)}
+  .vital-tile{min-width:0;text-align:center;padding:6px 4px;border-radius:10px}
+  .vital-label{font-size:12px;letter-spacing:.12em;color:#5b7a96;text-transform:uppercase}
+  .vital-num{font-family:ui-monospace,Consolas,monospace;font-size:35px;font-weight:700;line-height:1.1;
+    text-shadow:0 0 14px currentColor}
+  .vital-unit{font-size:12px;color:#5b7a96}
+  .vital-num.v-ok{color:#34d399}.vital-num.v-warn{color:#fbbf24}.vital-num.v-bad{color:#f87171}
+  .flash{animation:vflash .5s ease}
+  @keyframes vflash{0%{transform:scale(1.14);filter:brightness(1.8)}100%{transform:scale(1)}}
+  .sec-title{font-size:16px;font-weight:700;color:#bae6fd}
+  .sec-sub{font-size:12.5px;color:#64748b;font-weight:400}
+  /* 进化阶段流水线 */
+  .stage-chip{padding:8px 18px;border-radius:10px;border:1px solid #334155;color:#64748b;font-size:14px;font-weight:600;background:#0f172a;transition:all .3s}
+  .stage-chip.on{border-color:#0ea5e9;color:#7dd3fc;background:#0c4a6e33;box-shadow:0 0 16px #0ea5e955}
+  .stage-chip.done{border-color:#059669;color:#6ee7b7;background:#064e3b33}
+  .stage-chip.bad{border-color:#dc2626;color:#fca5a5;background:#7f1d1d33;box-shadow:0 0 16px #dc262655}
+  .stage-arrow{color:#334155;font-size:18px}
+  .shake{animation:shk .5s ease}
+  @keyframes shk{0%,100%{transform:translateX(0)}20%{transform:translateX(-7px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(3px)}}
+  /* 闸门卡片 */
+  .gate-card{border-radius:9px;padding:7px 10px;font-size:13px;border:1px solid transparent}
+  .bar-wrap{background:#0f172a;border-radius:6px;height:14px;overflow:hidden}
+  .bar-fill{height:100%;border-radius:6px;transition:width .8s cubic-bezier(.2,.8,.2,1)}
+</style>
+</head>
+<body>
+<div class="max-w-[1860px] mx-auto px-4 pt-3">
+
+  <!-- 顶栏（监护仪风格） -->
+  <div class="monitor-panel flex items-center justify-between flex-wrap gap-2 mb-2 px-4 py-2">
+    <div>
+      <div class="text-[19px] font-bold tracking-wide" style="color:#7dd3fc">床旁照护即进化——数字孪生驱动的重症 AI 自适应决策仿真 <span class="text-[13px] font-normal text-slate-500">SepsisICU-Harness Pro</span></div>
+      <div class="text-[13px] text-slate-400">Harness 进化版 · 情境化多臂老虎机 × HemoSim 数字孪生 × 反事实推演 × 可信度审计 <span class="text-slate-600">｜ 患者数据均为模拟生成</span></div>
+    </div>
+    <div class="flex items-center gap-2 text-[13px]">
+      <span id="llmDot" class="pill pill-gray">本地模型：未启用</span>
+      <span id="sessPill" class="pill pill-gray">未开始会话</span>
+    </div>
+  </div>
+
+  <!-- 页签 -->
+  <div class="flex gap-1.5 mb-3 overflow-x-auto pb-1" id="tabs">
+    <div class="tab-btn active" data-tab="t1">① 首页总览</div>
+    <div class="tab-btn" data-tab="t2">② ICU 数字孪生仪表盘</div>
+    <div class="tab-btn" data-tab="t3">③ 多目标决策中心</div>
+    <div class="tab-btn" data-tab="t4">④ 反事实推演</div>
+    <div class="tab-btn" data-tab="t5">⑤ Harness 进化</div>
+    <div class="tab-btn" data-tab="t6">⑥ 结局反馈</div>
+    <div class="tab-btn" data-tab="t7">⑦ 审计与消息板</div>
+    <div class="tab-btn" data-tab="t8">⑧ 可信度与解释</div>
+  </div>
+
+  <!-- ① 首页总览 -->
+  <div class="tab-page active" id="t1">
+    <div class="grid md:grid-cols-2 gap-4">
+      <div class="card p-5">
+        <div class="sec-title mb-3">为什么是「第三波·Pro」</div>
+        <div class="text-[15px] text-slate-300 space-y-2.5 leading-7">
+          <p><span class="pill pill-gray">第一波</span>　静态指南/CDSS —— 规则检索，个体化不足</p>
+          <p><span class="pill pill-gray">第二波</span>　单点大模型问答 —— 无反馈闭环，幻觉风险</p>
+          <p><span class="pill pill-gray">第三波</span>　在线学习闭环 —— POC6 已实现（Thompson 采样 + 结局反馈）</p>
+          <p><span class="pill pill-blue">第三波·Pro</span>　<b class="text-sky-300">照护即进化 + 照护即预演</b>：在闭环之上叠加四件事——</p>
+          <ul class="list-disc ml-5 space-y-1.5 text-slate-400 text-[14px]">
+            <li><b class="text-slate-200">数字孪生</b>：HemoSim 生理引擎给每位虚拟患者一个可推演的「平行世界」</li>
+            <li><b class="text-slate-200">反事实</b>：决策前先在各分支世界里预演一遍，因果安全线把关</li>
+            <li><b class="text-slate-200">Harness 进化</b>：调度器自身参数可被安全地自动调优，不变量硬编码守卫</li>
+            <li><b class="text-slate-200">可信度</b>：校准曲线 / 决策曲线 / 精确 Shapley 解释</li>
+          </ul>
+        </div>
+        <div class="mt-3 text-[12.5px] text-slate-500 border-t border-slate-800 pt-2">免责声明（按需求仅在关于/文档中保留，界面不展示横幅）：本 DEMO 为学术仿真原型，不接入真实患者与医院系统，全部病例与结局均为模拟生成，不构成任何诊疗建议。</div>
+      </div>
+      <div class="card p-5">
+        <div class="sec-title mb-3">会话设置</div>
+        <div class="space-y-3.5 text-[15px]">
+          <label class="flex items-center gap-2"><input type="checkbox" id="llmChk">
+            <span>启用本地模型增强（LM-Studio，可选；不勾选则全部规则引擎离线运行）</span></label>
+          <div>
+            <div class="mb-1 text-slate-400 text-[14px]">模式</div>
+            <div class="flex gap-3">
+              <label class="flex items-center gap-1.5"><input type="radio" name="mode" value="auto" checked> 自动生成模拟患者轨迹</label>
+              <label class="flex items-center gap-1.5"><input type="radio" name="mode" value="csv"> CSV 病例回放（10 例预生成）</label>
+            </div>
+          </div>
+          <div>
+            <div class="mb-1 text-slate-400 text-[14px]">并行床位（1–5 床）</div>
+            <input type="range" id="bedsRange" min="1" max="5" value="2" oninput="document.getElementById('bedsVal').textContent=this.value">
+            <div class="text-right text-sky-300 text-[13px]"><span id="bedsVal">2</span> 床</div>
+          </div>
+          <div>
+            <div class="mb-1 text-slate-400 text-[14px]">数字孪生精度档</div>
+            <div class="flex gap-3">
+              <label class="flex items-center gap-1.5"><input type="radio" name="prec" value="low"> 低档（快）</label>
+              <label class="flex items-center gap-1.5"><input type="radio" name="prec" value="mid" checked> 中档</label>
+              <label class="flex items-center gap-1.5"><input type="radio" name="prec" value="high"> 高档（细）</label>
+            </div>
+          </div>
+          <button class="btn btn-primary w-full" id="startBtn" style="font-size:16px;padding:12px">开始会话</button>
+          <div id="startMsg" class="text-[13px]"></div>
+        </div>
+      </div>
+    </div>
+    <div class="card p-4 mt-4">
+      <div class="sec-title mb-2">十分钟展示路线</div>
+      <div class="text-[14px] text-slate-400 leading-7">
+        ① 开 2–3 床会话 → ② 仪表盘：开「▶ 实时流入」看监护仪式数据流入与 ECG/脉搏波，拧旋钮看波形即时响应 → ③ 决策中心：调不确定性阈值，看蒙特卡洛采样点逐批涌现、🟢推荐/🟡随机 两分支、闸门逐条点亮、帕累托前沿 → ④ 反事实推演：「如果当时选另一个」双世界曲线从左到右生长 → ⑤ 点「Harness 进化」看 Propose→Probe→Compose 流水线点亮，再点「红队攻击」看 INV-3 拦截 → ⑥ 结局反馈：提交后看后验系数条收缩、不确定性曲线下降 → ⑦ 审计与消息板：TOON 压缩对比、多学科消息、Agent 掉线容错 → ⑧ 可信度：ECE 校准曲线、DCA、Shapley 解释
+      </div>
+    </div>
+  </div>
+
+  <!-- ② ICU 数字孪生仪表盘 -->
+  <div class="tab-page" id="t2">
+    <div class="flex items-center gap-3 mb-3 flex-wrap">
+      <span class="text-[14px] text-slate-400">选择床位：</span>
+      <div id="bedChips" class="flex gap-1.5"></div>
+      <button class="btn text-[13px]" id="advBtn">刷新下一时间步</button>
+      <button class="btn text-[13px]" id="adv4Btn">推进 4 步</button>
+      <button class="btn text-[13px]" id="liveBtn" title="模拟真实床旁监护数据流（复现 Flink 采集的时序体感，无需部署流引擎）">▶ 实时流入</button>
+      <label class="text-[13px] text-slate-400 flex items-center gap-1.5 ml-2">
+        <input type="checkbox" id="debugChk"> 显示表型调试信息（教学用）</label>
+    </div>
+    <div id="liveStat" class="hidden items-center gap-2 mb-3 text-[13px] monitor-panel px-3 py-2">
+      <span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" style="flex:none"></span>
+      <span class="text-emerald-300 font-bold">模拟数据流运行中</span>
+      <span class="text-slate-500">监护采集 ▸ 缓冲 ▸ 清洗 ▸ 写入孪生体</span>
+      <span id="liveCount" class="text-sky-300 ml-auto">已流入 0 条 · 约 1.2 s/条</span>
+    </div>
+
+    <!-- 监护横幅：ECG/脉搏波 + 大数字体征 -->
+    <div class="monitor-panel px-4 py-3 mb-3">
+      <div class="grid grid-cols-12 gap-3 items-center">
+        <div class="col-span-4">
+          <div class="flex justify-between items-baseline px-1">
+            <span class="vital-label">ECG 心电</span>
+            <span class="mono text-[13px]" style="color:#34d399"><span id="ecgHr">--</span> bpm</span>
+          </div>
+          <canvas id="ecgCanvas" height="66" style="width:100%;height:66px;display:block"></canvas>
+        </div>
+        <div class="col-span-2">
+          <div class="vital-label px-1">SpO₂ 脉搏波</div>
+          <canvas id="plethCanvas" height="66" style="width:100%;height:66px;display:block"></canvas>
+        </div>
+        <div class="col-span-6 grid grid-cols-5 gap-2">
+          <div class="vital-tile"><div class="vital-label">MAP</div><div class="vital-num v-warn" id="vMAP">--</div><div class="vital-unit">mmHg</div></div>
+          <div class="vital-tile"><div class="vital-label">SpO₂</div><div class="vital-num v-ok" id="vSPO2">--</div><div class="vital-unit">%</div></div>
+          <div class="vital-tile"><div class="vital-label">乳酸</div><div class="vital-num v-ok" id="vLAC">--</div><div class="vital-unit">mmol/L</div></div>
+          <div class="vital-tile"><div class="vital-label">去甲肾</div><div class="vital-num v-ok" id="vNE">--</div><div class="vital-unit">μg/kg/min</div></div>
+          <div class="vital-tile"><div class="vital-label">尿量</div><div class="vital-num v-ok" id="vURINE">--</div><div class="vital-unit">mL/h</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-12 gap-3">
+      <div class="card p-3.5 col-span-8">
+        <div class="flex justify-between items-center mb-2">
+          <div class="sec-title">生命体征波形 <span class="sec-sub">（HemoSim 数字孪生推演 · 40 点滑动窗口连续滚动）</span></div>
+          <span id="bedBadge"></span>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div><div style="position:relative;height:100px"><canvas id="chartMAP" height="100"></canvas></div><div class="text-center text-[12px] text-slate-500 mt-1">MAP (mmHg)</div></div>
+          <div><div style="position:relative;height:100px"><canvas id="chartLAC" height="100"></canvas></div><div class="text-center text-[12px] text-slate-500 mt-1">乳酸 (mmol/L)</div></div>
+          <div><div style="position:relative;height:100px"><canvas id="chartNE" height="100"></canvas></div><div class="text-center text-[12px] text-slate-500 mt-1">去甲肾上腺素 (μg/kg/min)</div></div>
+          <div><div style="position:relative;height:100px"><canvas id="chartURINE" height="100"></canvas></div><div class="text-center text-[12px] text-slate-500 mt-1">尿量 (mL/h)</div></div>
+        </div>
+      </div>
+      <div class="col-span-4 space-y-3">
+        <div class="card p-4">
+          <div class="sec-title mb-2">当前状态快照</div>
+          <div id="snapBox"></div>
+        </div>
+        <div class="card p-4">
+          <div class="sec-title mb-1">Frank–Starling 曲线 <span class="sec-sub">（本例收缩力）</span></div>
+          <div style="position:relative;height:98px"><canvas id="chartFS" height="98"></canvas></div>
+          <div class="text-[12px] text-slate-500 mt-1">蓝点 = 当前前负荷位置；曲线增益由表型决定</div>
+        </div>
+      </div>
+    </div>
+    <div id="debugBox" class="card p-4 mt-3 hidden">
+      <div class="sec-title mb-2 text-[14px]">表型调试信息 <span class="sec-sub">（仅教学演示；真实部署应由因果推断在线识别，而非直接观测）</span></div>
+      <div id="phenoBox" class="grid md:grid-cols-2 gap-x-8 text-[14px]"></div>
+    </div>
+    <div class="card p-4 mt-3">
+      <div class="sec-title mb-2 text-[14px]">数字孪生手动旋钮 <span class="sec-sub">（「照护即预演」：拧动生理参数，观察波形即时响应）</span></div>
+      <div class="grid md:grid-cols-3 gap-4 text-[13px] text-slate-400">
+        <div>收缩力 <span id="knobCVal" class="text-sky-300"></span><input type="range" id="knobC" min="30" max="120" value="100"></div>
+        <div>血管张力 <span id="knobSVal" class="text-sky-300"></span><input type="range" id="knobS" min="40" max="180" value="100"></div>
+        <div>前负荷 <span id="knobPVal" class="text-sky-300"></span><input type="range" id="knobP" min="50" max="150" value="100"></div>
+      </div>
+      <div class="mt-2 flex gap-2">
+        <button class="btn text-[13px]" id="knobApply">应用到本床数字孪生</button>
+        <button class="btn text-[13px]" id="knobReset">复位</button>
+        <span class="text-[12.5px] text-slate-500 self-center">注：旋钮只改变本床孪生体，用于演示「先预演、后执行」</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ③ 多目标决策中心 -->
+  <div class="tab-page" id="t3">
+    <div class="grid grid-cols-12 gap-3">
+      <div class="card p-4 col-span-5 space-y-3">
+        <div class="sec-title">决策参数</div>
+        <div>
+          <div class="flex justify-between text-[13px] text-slate-400 mb-1"><span>不确定性阈值</span><span class="text-sky-300 text-[15px] font-bold" id="thrVal">60</span></div>
+          <input type="range" id="thrRange" min="20" max="90" value="60" oninput="document.getElementById('thrVal').textContent=this.value">
+          <div class="text-[12.5px] text-slate-500 mt-1">不确定性 ≥ 阈值 → 🟡 低置信随机分支（均势池内抽签）；&lt; 阈值 → 🟢 高置信推荐</div>
+        </div>
+        <div>
+          <div class="text-[13px] text-slate-400 mb-1">医生多目标权重（帕累托前沿标量化）</div>
+          <div class="space-y-2 text-[13px] text-slate-400">
+            <div>生存概率 <span id="wSVal" class="text-sky-300">0.5</span><input type="range" class="wSlider" data-k="survival" min="0" max="100" value="50"></div>
+            <div>乳酸清除 <span id="wLVal" class="text-sky-300">0.3</span><input type="range" class="wSlider" data-k="lactate_clearance" min="0" max="100" value="30"></div>
+            <div>液体安全 <span id="wFVal" class="text-sky-300">0.2</span><input type="range" class="wSlider" data-k="fluid_safety" min="0" max="100" value="20"></div>
+          </div>
+        </div>
+        <div>
+          <div class="text-[13px] text-slate-400 mb-1">床位</div>
+          <div id="decBedChips" class="flex gap-1.5"></div>
+        </div>
+        <button class="btn btn-primary w-full" id="decRunBtn" style="font-size:15px;padding:11px">执行决策计算（情境化 TS × 帕累托 × 反事实预演 × 六闸门）</button>
+        <div id="decResult" class="text-[14px] space-y-2 scrollbox" style="max-height:330px"></div>
+      </div>
+      <div class="card p-4 col-span-7">
+        <div class="sec-title mb-2">帕累托前沿 <span class="sec-sub">（三目标：生存 × 乳酸清除 × 液体安全，蒙特卡洛采样非支配排序）</span></div>
+        <div style="position:relative;height:300px"><canvas id="chartPareto" height="300"></canvas></div>
+        <div id="paretoLegend" class="text-[13px] text-slate-400 mt-2"></div>
+        <div class="mt-3 border-t border-slate-800 pt-3">
+          <div class="sec-title mb-2 text-[14px]">安全闸门（六项，全过才执行）</div>
+          <div id="gateBox" class="grid grid-cols-3 gap-2"></div>
+        </div>
+        <div class="mt-3 border-t border-slate-800 pt-3 hidden" id="overrideBox">
+          <div class="sec-title mb-2 text-[14px]" style="color:#fde68a">医生否决 / 改判（医生始终拥有最终决策权）</div>
+          <div class="flex gap-2 flex-wrap" id="overrideBtns"></div>
+          <div id="overrideMsg" class="text-[13px] mt-2"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ④ 反事实推演 -->
+  <div class="tab-page" id="t4">
+    <div class="card p-4 mb-3">
+      <div class="flex gap-2 items-center flex-wrap">
+        <div class="sec-title" style="flex:none">「照护即预演」反事实沙盘</div>
+        <span class="text-[13px] text-slate-400">在数字孪生中分叉出多个平行世界：现实分支 vs 反事实分支，比较 MAP / 乳酸轨迹与结局指标，给出 ATE 与置信区间。<b class="text-slate-200">仅 HemoSim 内部模拟推演，非临床预测。</b></span>
+      </div>
+      <div class="flex gap-2 mt-2.5 flex-wrap items-center">
+        <span class="text-[13px] text-slate-400">添加反事实分支：</span>
+        <button class="btn text-[13px] cfAdd" data-a="A">+ 如果选 A（液体）</button>
+        <button class="btn text-[13px] cfAdd" data-a="B">+ 如果选 B（升压药）</button>
+        <button class="btn text-[13px] cfAdd" data-a="AB">+ 如果选 AB（联合）</button>
+        <span class="text-[13px] text-slate-400 ml-2">床位</span>
+        <div id="cfBedChips" class="flex gap-1.5"></div>
+        <button class="btn btn-primary text-[13px]" id="cfRunBtn">运行反事实推演</button>
+      </div>
+      <div id="cfChips" class="flex gap-1.5 mt-2 flex-wrap"></div>
+    </div>
+    <div class="grid grid-cols-2 gap-3">
+      <div class="card p-4"><div class="sec-title mb-2 text-[14px]">MAP 轨迹：现实 vs 反事实</div><div style="position:relative;height:265px"><canvas id="chartCFMAP" height="265"></canvas></div></div>
+      <div class="card p-4"><div class="sec-title mb-2 text-[14px]">乳酸轨迹：现实 vs 反事实</div><div style="position:relative;height:265px"><canvas id="chartCFLAC" height="265"></canvas></div></div>
+    </div>
+    <div class="card p-4 mt-3">
+      <div class="sec-title mb-2 text-[14px]">分支结局对比 & 平均处理效应（ATE）</div>
+      <div id="cfTable" class="text-[14px]"></div>
+    </div>
+  </div>
+
+  <!-- ⑤ Harness 进化 -->
+  <div class="tab-page" id="t5">
+    <div class="grid grid-cols-12 gap-3">
+      <div class="card p-4 col-span-5">
+        <div class="sec-title mb-2">Harness 注册表 <span class="sec-sub">（哪些是零件、哪些可进化）</span></div>
+        <div id="registryBox" class="text-[14px]"></div>
+        <div class="mt-3 pt-3 border-t border-slate-800">
+          <div class="sec-title mb-2 text-[14px]">双层递归闭环（架构）</div>
+          <pre class="mono text-[11.5px] text-slate-400 rounded p-2 leading-5" style="background:#070d18">┌─ 外循环：Harness 级进化（冻结模型权重，只改 Harness）
+│   Propose ──→ Probe ──→ Compose
+│   (提出修改)   (模拟病例验证) (沉淀更优Harness)
+│        ↑__________│ 复用经验库 ← 每病例轨迹证据
+├─ 内循环：床旁照护即学习（POC6 升级版）
+│   模拟患者→证据检索→多Agent协作→贝叶斯MAB
+│   →高置信推荐/低置信随机→医生否决→结局反馈→轨迹回放</pre>
+        </div>
+        <div class="mt-3 pt-3 border-t border-slate-800">
+          <div class="sec-title mb-2 text-[14px]" style="color:#fde68a">不变约束（代码级硬编码，任何版本不可变）</div>
+          <div id="invBox" class="text-[13px] space-y-1.5"></div>
+        </div>
+      </div>
+      <div class="card p-4 col-span-7">
+        <div class="sec-title mb-2">进化控制台 <span class="sec-sub">（LLM 只解读、Harness 只调度，绝不修改决策数值）</span></div>
+        <!-- Propose → Probe → Compose 流水线 -->
+        <div class="flex items-center gap-2 mb-3 flex-wrap" id="stageRow">
+          <span class="stage-chip" id="stgPropose">① Propose 提出修改</span>
+          <span class="stage-arrow">──▶</span>
+          <span class="stage-chip" id="stgGuard">② 不变量守卫</span>
+          <span class="stage-arrow">──▶</span>
+          <span class="stage-chip" id="stgProbe">③ Probe 回放验证</span>
+          <span class="stage-arrow">──▶</span>
+          <span class="stage-chip" id="stgCompose">④ Compose 采纳/拒绝</span>
+        </div>
+        <div class="flex gap-2 flex-wrap mb-3">
+          <button class="btn btn-primary" id="evolveBtn">运行一轮进化</button>
+          <button class="btn btn-danger" id="redteamBtn">红队攻击：尝试非法进化</button>
+          <button class="btn" id="rollbackBtn">回滚至出厂</button>
+        </div>
+        <div id="harnessState" class="text-[12.5px] mono rounded p-2.5 mb-3" style="background:#070d18"></div>
+        <div id="evolveResult" class="text-[14px] space-y-2"></div>
+        <div class="mt-3">
+          <div class="sec-title mb-1 text-[14px]">进化历史</div>
+          <div id="evolveHist" class="scrollbox text-[12.5px] mono"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ⑥ 结局反馈 -->
+  <div class="tab-page" id="t6">
+    <div class="grid grid-cols-12 gap-3">
+      <div class="card p-4 col-span-5 space-y-3.5">
+        <div class="sec-title">结局反馈（闭环学习的燃料）</div>
+        <div>
+          <div class="text-[13px] text-slate-400 mb-1">反馈来源</div>
+          <div class="flex gap-3 text-[14px]">
+            <label class="flex items-center gap-1.5"><input type="radio" name="fbsrc" value="hemosim" checked> HemoSim 半自动（数字孪生推演结局）</label>
+            <label class="flex items-center gap-1.5"><input type="radio" name="fbsrc" value="manual"> 人工评定</label>
+          </div>
+        </div>
+        <div id="fbManualBox" class="hidden">
+          <div class="text-[13px] text-slate-400 mb-1">人工奖励（0–1，结局质量综合评分）</div>
+          <input type="range" id="fbReward" min="0" max="100" value="60" oninput="document.getElementById('fbRewardVal').textContent=(this.value/100).toFixed(2)">
+          <div class="text-right text-sky-300 text-[13px]"><span id="fbRewardVal">0.60</span></div>
+        </div>
+        <div class="flex gap-2 items-center">
+          <span class="text-[13px] text-slate-400">床位</span>
+          <div id="fbBedChips" class="flex gap-1.5"></div>
+        </div>
+        <button class="btn btn-primary" id="fbBtn">提交结局反馈 → 更新策略后验</button>
+        <div id="fbResult" class="text-[14px]"></div>
+      </div>
+      <div class="col-span-7 space-y-3">
+        <div class="card p-4">
+          <div class="flex justify-between items-center mb-2">
+            <div class="sec-title text-[14px]">后验系数表 <span class="sec-sub">（贝叶斯 logistic，在线 Laplace；条 = μ，右 = σ）</span></div>
+            <div id="armChips" class="flex gap-1.5"></div>
+          </div>
+          <div id="coefBox" class="text-[13px]"></div>
+        </div>
+        <div class="card p-4">
+          <div class="sec-title mb-2 text-[14px]">不确定性随学习下降</div>
+          <div style="position:relative;height:200px"><canvas id="chartUnc" height="200"></canvas></div>
+        </div>
+      </div>
+    </div>
+    <div class="card p-3.5 mt-3 text-[13px] text-slate-500 leading-6">
+      RSI 三层经验回灌：<b class="text-slate-300">L1 即时</b>——反馈立即写入贝叶斯后验；
+      <b class="text-slate-300">L2 轨迹</b>——完整诊疗轨迹存入经验回放池，供 Harness 进化 Probe 使用；
+      <b class="text-slate-300">L3 策略</b>——高奖励案例沉淀为策略文本，注入后续提示词。
+    </div>
+  </div>
+
+  <!-- ⑦ 审计与消息板 -->
+  <div class="tab-page" id="t7">
+    <div class="grid grid-cols-2 gap-3">
+      <div class="card p-4">
+        <div class="sec-title mb-2">审计日志 <span class="sec-sub">（JSONL 追加写，含 TOON 压缩对比）</span></div>
+        <div id="toonDemo" class="text-[12.5px] mono rounded p-2.5 mb-2" style="background:#070d18;white-space:pre-wrap"></div>
+        <div class="scrollbox"><table class="audit"><thead><tr><th>时间</th><th>事件</th><th>摘要</th><th>TOON节省</th></tr></thead><tbody id="auditBody"></tbody></table></div>
+      </div>
+      <div class="card p-4">
+        <div class="sec-title mb-2">多学科消息板 <span class="sec-sub">（SCALEMAS 式协调 + 掉线容错）</span></div>
+        <div class="flex gap-2 mb-2 flex-wrap">
+          <button class="btn text-[13px]" id="consultBtn">发起多学科会诊轮询</button>
+          <button class="btn text-[13px]" id="faultBtn">Agent 掉线容错演示</button>
+          <input id="boardSearch" class="btn text-[13px] w-44" style="background:#070d18" placeholder="搜索消息…回车">
+        </div>
+        <div id="agentState" class="text-[13px] text-slate-400 mb-2"></div>
+        <div class="scrollbox space-y-1.5" id="boardBox"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ⑧ 可信度与解释 -->
+  <div class="tab-page" id="t8">
+    <div class="grid grid-cols-3 gap-3">
+      <div class="card p-4">
+        <div class="sec-title mb-2 text-[14px]">校准曲线（ECE） <span class="sec-sub">（200 例模拟队列）</span></div>
+        <div style="position:relative;height:280px"><canvas id="chartECE" height="280"></canvas></div>
+        <div id="eceScore" class="text-[14px] mt-2"></div>
+      </div>
+      <div class="card p-4">
+        <div class="sec-title mb-2 text-[14px]">决策曲线分析（DCA）</div>
+        <div style="position:relative;height:280px"><canvas id="chartDCA" height="280"></canvas></div>
+        <div class="text-[12.5px] text-slate-500 mt-2">净获益 = 获益 − 危害；模型曲线高于 treat-all / treat-none 的阈值区间才有临床效用（演示口径）</div>
+      </div>
+      <div class="card p-4">
+        <div class="sec-title mb-2 text-[14px]">精确 Shapley 特征归因 <span class="sec-sub">（2⁹=512 子集枚举）</span></div>
+        <div class="flex gap-2 mb-2 items-center">
+          <span class="text-[13px] text-slate-400">床位</span>
+          <div id="shapBedChips" class="flex gap-1.5"></div>
+          <button class="btn text-[13px]" id="shapBtn">重新计算</button>
+        </div>
+        <div style="position:relative;height:280px"><canvas id="chartShap" height="280"></canvas></div>
+        <div id="shapNote" class="text-[12.5px] text-slate-500 mt-2"></div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /max-w -->
+
+<script>
+/* ================= 全局状态与工具 ================= */
+const S = { beds:{}, curBed:1, decision:null, decisionId:null, cfActions:[],
+  charts:{}, uncHist:[], cfg:null };
+const $ = id => document.getElementById(id);
+const sleep = ms => new Promise(r=>setTimeout(r, ms));
+async function api(path, opts={}){
+  const r = await fetch(path, {headers:{'Content-Type':'application/json'}, ...opts});
+  const j = await r.json().catch(()=>({}));
+  if(!r.ok) throw new Error(j.detail || ('HTTP '+r.status));
+  return j;
+}
+const post = (path, body) => api(path, {method:'POST', body: JSON.stringify(body||{})});
+function pill(txt, cls){ return `<span class="pill ${cls}">${txt}</span>`; }
+function destroyChart(k){ if(S.charts[k]){ S.charts[k].destroy(); delete S.charts[k]; } }
+const CHART_BASE = {responsive:true, maintainAspectRatio:false, animation:false,
+  plugins:{legend:{labels:{color:'#94a3b8',boxWidth:12,font:{size:11}}}},
+  scales:{x:{ticks:{color:'#64748b',font:{size:11}},grid:{color:'#1e293b33'}},
+          y:{ticks:{color:'#64748b',font:{size:11}},grid:{color:'#1e293b33'}}}};
+const CHART_ANIM = JSON.parse(JSON.stringify(CHART_BASE));
+CHART_ANIM.maintainAspectRatio = false;
+CHART_ANIM.animation = {duration:900, easing:'easeOutQuart'};
+const PALETTE = ['#38bdf8','#f472b6','#a3e635','#fbbf24','#c084fc','#34d399'];
+
+/* ================= 页签切换 ================= */
+document.querySelectorAll('#tabs .tab-btn').forEach(b=>{
+  b.onclick = ()=>{
+    document.querySelectorAll('#tabs .tab-btn').forEach(x=>x.classList.remove('active'));
+    document.querySelectorAll('.tab-page').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active');
+    $(b.dataset.tab).classList.add('active');
+    if(b.dataset.tab !== 't2') stopLive();
+    ({t2:renderDash, t3:renderDecTab, t4:renderCFTab, t5:renderHarness, t6:renderFeedback, t7:renderAuditBoard, t8:renderCalib})[b.dataset.tab]?.();
+  };
+});
+function gotoTab(n){ document.querySelector(`#tabs .tab-btn[data-tab="t${n}"]`).click(); }
+
+/* ================= 床位 chips ================= */
+function bedChips(el, selected){
+  el.innerHTML = Object.keys(S.beds).map(b=>
+    `<button class="btn text-[13px] ${+b===selected?'btn-primary':''}" data-bed="${b}">床 ${b}</button>`).join('');
+  el.querySelectorAll('button').forEach(x=> x.onclick = ()=>{ stopLive(); S.curBed = +x.dataset.bed; refreshAll(); });
+}
+function refreshAll(){ renderDash(); renderDecTab(); renderCFTab(); renderFeedback(); }
+
+/* ================= 会话 ================= */
+$('startBtn').onclick = async ()=>{
+  const msg = $('startMsg'); msg.textContent = '正在初始化…'; msg.className='text-[13px] text-sky-300';
+  try{
+    const llm = $('llmChk').checked;
+    const mode = document.querySelector('input[name=mode]:checked').value;
+    const prec = document.querySelector('input[name=prec]:checked').value;
+    const beds = +$('bedsRange').value;
+    const j = await post('/api/session/init', {beds, precision:prec, mode, llm_enabled:llm});
+    stopLive();
+    S.beds = j.beds; S.curBed = 1; S.decision=null; S.decisionId=null; S.cfActions=[]; S.uncHist=[];
+    $('sessPill').textContent = `会话 ${j.session}`;
+    $('sessPill').className = 'pill pill-blue';
+    msg.innerHTML = `✓ 已开启 ${beds} 床 · ${mode==='csv'?'CSV回放':'自动生成'} · 精度 ${prec}` + (llm?' · 已请求本地模型增强':'');
+    refreshHealth(); refreshAll(); loadConfigOnce();
+  }catch(e){ msg.textContent = '启动失败：'+e.message; msg.className='text-[13px] text-red-400'; }
+};
+async function refreshHealth(){
+  try{
+    const h = await api('/api/health');
+    if(h.llm_enabled && h.llm){
+      const ok = h.llm.connected;
+      $('llmDot').textContent = ok ? `本地模型：${h.llm.message || '已连接'}` : '本地模型：未连接（离线降级运行）';
+      $('llmDot').className = 'pill ' + (ok ? 'pill-green' : 'pill-yellow');
+    } else { $('llmDot').textContent='本地模型：未启用'; $('llmDot').className='pill pill-gray'; }
+  }catch(e){}
+}
+let cfgLoaded = false;
+async function loadConfigOnce(){
+  if(cfgLoaded) return; cfgLoaded = true;
+  S.cfg = await api('/api/config');
+  $('invBox').innerHTML = S.cfg.invariants.rules.map(r=>
+    `<div class="flex gap-2"><span class="pill pill-red" style="flex:none">${r.id}</span><span class="text-slate-300">${r.name}：${r.desc}</span></div>`).join('');
+}
+
+/* ================= ② 数字孪生仪表盘 ================= */
+async function renderDash(){
+  if(!Object.keys(S.beds).length) return;
+  bedChips($('bedChips'), S.curBed);
+  const b = S.beds[S.curBed]; if(!b) return;
+  const hist = b.history || [b.snapshot];
+  $('bedBadge').innerHTML = pill(`床 ${S.curBed} · ${b.phenotype_label||b.phenotype}`, 'pill-blue');
+  const labels = hist.map((h,i)=>h.step ?? i);
+  const mk = (k, cid, key, color, extra={}) => {
+    destroyChart(k);
+    S.charts[k] = new Chart($(cid), {type:'line', data:{labels, datasets:[{label:key, data:hist.map(h=>h[key]), borderColor:color, pointRadius:0, borderWidth:1.8, tension:.3}]}, options:{...CHART_BASE, ...extra}});
+  };
+  mk('map','chartMAP','map','#38bdf8');
+  mk('lac','chartLAC','lactate','#f472b6');
+  mk('ne','chartNE','ne_dose','#fbbf24');
+  mk('urine','chartURINE','urine','#34d399');
+  renderSnap(b);
+  updateVitals(b);
+  drawFS(b);
+  const dbg = $('debugChk').checked;
+  $('debugBox').classList.toggle('hidden', !dbg);
+  if(dbg){
+    const f = b.features||[]; const names = S.cfg ? S.cfg.feature_labels : [];
+    $('phenoBox').innerHTML =
+      `<div class="kv"><span class="text-slate-400">表型（教学直接观测）</span><b>${b.phenotype}</b></div>` +
+      (names.length ? names.map((n,i)=>`<div class="kv"><span class="text-slate-400">特征·${n}</span><b>${(+f[i]).toFixed(2)}</b></div>`).join('') : '');
+  }
+}
+function renderSnap(b){
+  const s = b.snapshot;
+  const kv = (k,v,u='') => `<div class="kv"><span class="text-slate-400">${k}</span><b>${(+v).toFixed(2).replace(/\.?0+$/,'')}${u}</b></div>`;
+  $('snapBox').innerHTML =
+    kv('HR', s.hr, ' bpm') + kv('MAP', s.map, ' mmHg') + kv('乳酸', s.lactate, ' mmol/L') +
+    kv('去甲肾', s.ne_dose, ' μg/kg/min') + kv('尿量', s.urine, ' mL/h') + kv('SOFA', s.sofa) +
+    kv('SpO₂', s.spo2, '%') + kv('CVP', s.cvp, ' mmHg') + kv('累积液体', s.fluid_total, ' mL') +
+    kv('容量反应性', b.fluid_response) +
+    `<div class="kv"><span class="text-slate-400">液体过负荷</span><b>${s.fluid_overload>0.5?'⚠ '+s.fluid_overload.toFixed(2):'无'}</b></div>`;
+}
+function setVital(id, val, cls){
+  const el = $(id); if(!el || el.textContent===val) { if(el) el.className = 'vital-num '+cls; return; }
+  el.textContent = val; el.className = 'vital-num '+cls+' flash';
+  setTimeout(()=>el.classList.remove('flash'), 550);
+}
+function updateVitals(b){
+  const s = b.snapshot; if(!s) return;
+  MON.hr = s.hr; MON.map = s.map; MON.alarm = (s.hr>120 || s.map<55);
+  $('ecgHr').textContent = (+s.hr).toFixed(0);
+  $('ecgHr').style.color = MON.alarm ? '#f87171' : '#34d399';
+  setVital('vMAP', (+s.map).toFixed(0), s.map<55?'v-bad':(s.map<60?'v-warn':'v-ok'));
+  setVital('vSPO2', (+s.spo2).toFixed(0), s.spo2<92?'v-bad':(s.spo2<95?'v-warn':'v-ok'));
+  setVital('vLAC', (+s.lactate).toFixed(1), s.lactate>4?'v-bad':(s.lactate>2?'v-warn':'v-ok'));
+  setVital('vNE', (+s.ne_dose).toFixed(2), s.ne_dose>0.8?'v-warn':'v-ok');
+  setVital('vURINE', (+s.urine).toFixed(0), s.urine<15?'v-bad':(s.urine<30?'v-warn':'v-ok'));
+}
+/* ---- 监护横幅示波器：ECG / 脉搏波滚动动画（速度与 HR 联动） ---- */
+const MON = {t:0, hr:90, map:70, alarm:false};
+function ecgY(phi){
+  if(phi<0.08) return 0;
+  if(phi<0.15) return Math.sin((phi-0.08)/0.07*Math.PI)*0.13;                 // P
+  if(phi<0.26) return 0;
+  if(phi<0.30) return -(phi-0.26)/0.04*0.15;                                  // Q
+  if(phi<0.345) return -0.15+((phi-0.30)/0.045)*1.15;                         // R 上升支
+  if(phi<0.40) return 1.0-((phi-0.345)/0.055)*1.25;                           // S 下降支
+  if(phi<0.47) return -0.25+((phi-0.40)/0.07)*0.25;                           // 回升
+  if(phi<0.60) return 0;
+  if(phi<0.80) return Math.sin((phi-0.60)/0.20*Math.PI)*0.25;                 // T
+  return 0;
+}
+function plethY(phi){ // 偏斜脉搏波
+  if(phi<0 || phi>0.62) return 0;
+  return Math.pow(Math.sin(Math.PI*phi/0.62), 0.65)*(1-0.22*phi);
+}
+function drawScope(cid, waveFn, color, amp, base){
+  const cv = $(cid); if(!cv) return;
+  const W = cv.width = cv.clientWidth * (window.devicePixelRatio||1);
+  const H = cv.height = (cv.clientHeight||86) * (window.devicePixelRatio||1);
+  const ctx = cv.getContext('2d');
+  ctx.clearRect(0,0,W,H);
+  ctx.strokeStyle = 'rgba(56,189,248,.07)'; ctx.lineWidth = 1;
+  for(let gx=0; gx<W; gx+=W/12){ ctx.beginPath(); ctx.moveTo(gx,0); ctx.lineTo(gx,H); ctx.stroke(); }
+  for(let gy=0; gy<H; gy+=H/4){ ctx.beginPath(); ctx.moveTo(0,gy); ctx.lineTo(W,gy); ctx.stroke(); }
+  const pxPerSec = 110 * (window.devicePixelRatio||1);
+  ctx.strokeStyle = color; ctx.lineWidth = 2*(window.devicePixelRatio||1);
+  ctx.shadowColor = color; ctx.shadowBlur = 8;
+  ctx.beginPath();
+  for(let x=0; x<W; x++){
+    const t = MON.t - (W-1-x)/pxPerSec;
+    const phi = ((t*MON.hr/60) % 1 + 1) % 1;
+    const y = H*(base - waveFn(phi)*amp);
+    x===0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
+  }
+  ctx.stroke(); ctx.shadowBlur = 0;
+}
+function scopeLoop(){
+  if($('t2').classList.contains('active') && Object.keys(S.beds).length){
+    MON.t += 1/60;
+    const c = MON.alarm ? '#f87171' : '#34d399';
+    drawScope('ecgCanvas', ecgY, c, 0.36, 0.62);
+    drawScope('plethCanvas', plethY, '#38bdf8', 0.72, 0.75);
+  }
+  requestAnimationFrame(scopeLoop);
+}
+requestAnimationFrame(scopeLoop);
+
+/* ================= 实时数据流模拟（复现监护仪流式采集体感，纯前端定时驱动） ================= */
+S.live = {on:false, timer:null, n:0};
+const LIVE_TICK_MS = 1200;
+$('liveBtn').onclick = ()=> S.live.on ? stopLive() : startLive();
+function startLive(){
+  if(!Object.keys(S.beds).length){ alert('请先开始会话'); return; }
+  S.live.on = true; S.live.n = 0;
+  $('liveBtn').textContent = '⏸ 停止流入'; $('liveBtn').classList.add('btn-primary');
+  $('liveCount').textContent = `已流入 0 条 · 约 ${(LIVE_TICK_MS/1000).toFixed(1)} s/条`;
+  $('liveStat').classList.remove('hidden'); $('liveStat').classList.add('flex');
+  liveTick();
+  S.live.timer = setInterval(liveTick, LIVE_TICK_MS);
+}
+function stopLive(){
+  if(!S.live.on) return;
+  S.live.on = false; clearInterval(S.live.timer); S.live.timer = null;
+  $('liveBtn').textContent = '▶ 实时流入'; $('liveBtn').classList.remove('btn-primary');
+  $('liveStat').classList.add('hidden'); $('liveStat').classList.remove('flex');
+}
+async function liveTick(){
+  try{
+    const j = await post(`/api/patient/advance?bed=${S.curBed}`, {steps:1});
+    S.live.n++;
+    $('liveCount').textContent = `已流入 ${S.live.n} 条 · 约 ${(LIVE_TICK_MS/1000).toFixed(1)} s/条`;
+    pushLive(j);
+  }catch(e){ stopLive(); alert('数据流中断：'+e.message); }
+}
+// 流式增量渲染：只追加/滑动波形数据，不重建图表 → 监护仪式连续滚动
+function pushLive(j){
+  S.beds[S.curBed] = j;
+  const hist = (j.history || [j.snapshot]).slice(-40);
+  const labels = hist.map((h,i)=>h.step ?? i);
+  const KEYS = {map:'map', lac:'lactate', ne:'ne_dose', urine:'urine'};
+  for(const [k, key] of Object.entries(KEYS)){
+    const c = S.charts[k]; if(!c) continue;
+    c.data.labels = labels;
+    c.data.datasets[0].data = hist.map(h=>h[key]);
+    c.update('none');
+  }
+  $('bedBadge').innerHTML = pill(`床 ${S.curBed} · ${j.phenotype_label||j.phenotype}`, 'pill-blue');
+  renderSnap(j);
+  updateVitals(j);
+}
+$('debugChk').onchange = renderDash;
+// 数字孪生旋钮
+function knobLabels(){
+  $('knobCVal').textContent = ($('knobC').value/100).toFixed(2)+'×';
+  $('knobSVal').textContent = ($('knobS').value/100).toFixed(2)+'×';
+  $('knobPVal').textContent = ($('knobP').value/100).toFixed(2)+'×';
+}
+['knobC','knobS','knobP'].forEach(id=> $(id).oninput = knobLabels); knobLabels();
+$('knobApply').onclick = async ()=>{
+  try{
+    const j = await post('/api/patient/knobs?bed='+S.curBed, {
+      contractility_mul:+$('knobC').value/100, svr_mul:+$('knobS').value/100, preload_mul:+$('knobP').value/100});
+    S.beds[S.curBed]=j; renderDash();
+  }catch(e){ alert(e.message); }
+};
+$('knobReset').onclick = async ()=>{
+  $('knobC').value=100; $('knobS').value=100; $('knobP').value=100; knobLabels();
+  try{ const j = await post('/api/patient/knobs?bed='+S.curBed, {contractility_mul:1, svr_mul:1, preload_mul:1}); S.beds[S.curBed]=j; renderDash(); }catch(e){}
+};
+function drawFS(b){
+  destroyChart('fs');
+  const cvp = (b.features?.[7] ?? 0.5)*15/15;
+  const pts = Array.from({length:25},(_,i)=>{ const p=i/24; return (1-Math.exp(-2.5*p))/(1-Math.exp(-2.125)); });
+  const cur = Math.min(24, Math.round((b.features?.[7]??0.5)*24));
+  S.charts.fs = new Chart($('chartFS'), {type:'line',
+    data:{labels:pts.map((_,i)=>(i/24*15).toFixed(1)),
+      datasets:[{label:'SV 因子', data:pts, borderColor:'#38bdf8', pointRadius:0, borderWidth:2, tension:.3},
+                {label:'当前', data:pts.map((_,i)=>i===cur?pts[i]:null), borderColor:'#fbbf24', backgroundColor:'#fbbf24', pointRadius:5, showLine:false}]},
+    options:CHART_BASE});
+}
+
+/* ================= ③ 决策中心 ================= */
+async function renderDecTab(){
+  if(!Object.keys(S.beds).length) return;
+  bedChips($('decBedChips'), S.curBed);
+}
+document.querySelectorAll('.wSlider').forEach(w=>{
+  w.oninput = ()=>{ $('w'+w.dataset.k[0].toUpperCase()+'Val').textContent = (w.value/100).toFixed(1); };
+});
+function weights(){ return { survival:+$('wSVal').textContent, lactate_clearance:+$('wLVal').textContent, fluid_safety:+$('wFVal').textContent }; }
+function tweenNum(el, to, dur=650, fmt=v=>v.toFixed(0)){
+  const from = parseFloat(el.dataset.v||'0'); const t0 = performance.now();
+  (function step(t){
+    const p = Math.min(1,(t-t0)/dur), v = from+(to-from)*(1-Math.pow(1-p,3));
+    el.textContent = fmt(v);
+    if(p<1) requestAnimationFrame(step); else el.dataset.v = to;
+  })(t0);
+}
+$('decRunBtn').onclick = async ()=>{
+  const box = $('decResult');
+  $('decRunBtn').disabled = true;
+  box.innerHTML = '<span class="text-slate-400">蒙特卡洛反事实预演计算中…</span>';
+  try{
+    const j = await post('/api/decision/run', {bed:S.curBed, threshold:+$('thrVal').textContent, weights:weights()});
+    $('decRunBtn').disabled = false;
+    S.decision = j.decision; S.decisionId = j.decision_id; S.beds[S.curBed] = j.bed;
+    const d = j.decision;
+    const branchPill = d.branch==='recommend' ? pill('🟢 高置信推荐','pill-green')
+                     : d.branch==='randomize' ? pill('🟡 低置信随机','pill-yellow')
+                     : pill('⚠ 闸门改判','pill-red');
+    box.innerHTML = `<div class="fadein space-y-2">
+      <div class="flex items-center gap-2 flex-wrap">推荐动作：<b class="text-[26px] text-sky-300 mono">${d.action}</b> ${branchPill}
+        <span class="text-[12.5px] text-slate-500">决策号 ${j.decision_id} · 冻结哈希 ${d.frozen_hash}</span></div>
+      <div class="text-[13px] text-slate-400">不确定性 <b class="text-amber-300 text-[17px] mono"><span id="uncNum" data-v="0">0</span></b> ｜ 臂均值：${Object.entries(d.arm_means).map(([k,v])=>`${k}=${(v*100).toFixed(0)}%`).join(' · ')} · P(最优)=${(d.p_best*100).toFixed(0)}%</div>
+      <div class="text-[12.5px] text-slate-400">反思复核（Fresh${d.review.triggered?'·已触发':''}）：${d.review.agree?'✓ 一致':'⚠ 不一致 → '+d.review.second_action} ｜ 生成分支顺序翻转：${d.flip_test.consistent?'✓':'✗'} ｜ 选项顺序翻转（M4）：${d.order_flip.consistent?'✓ '+d.order_flip.samples.join('/')+' 均一致':'✗ 不稳定'}</div>
+      ${d.review.llm_opinion?`<div class="text-[13px] text-slate-300 rounded p-2" style="background:#070d18"><b class="text-sky-300">独立文本复核（LLM 第二意见）：</b>${d.review.llm_opinion}</div>`:''}
+      ${d.gate_blocked?`<div class="text-[13px] text-red-300">闸门拦截：${d.gate_blocked.join('；')}</div>`:''}
+      <div class="flex gap-2 mt-1 flex-wrap">
+        <button class="btn text-[13px]" id="llmBtn">本地 LLM 解读（可选）</button>
+        <button class="btn text-[13px]" onclick="gotoTab(4)">去反事实推演 →</button>
+      </div>
+      <div id="llmOut" class="text-[13px] text-slate-300 rounded p-2 hidden" style="background:#070d18"></div>
+    </div>`;
+    tweenNum($('uncNum'), d.uncertainty, 800);
+    $('llmBtn').onclick = async ()=>{
+      const out = $('llmOut'); out.classList.remove('hidden'); out.textContent='调用本地模型…';
+      try{ const r = await post('/api/llm/interpret?decision_id='+j.decision_id); out.textContent = r.ok ? r.text : '（未连接 LM-Studio）'+r.message; }
+      catch(e){ out.textContent = '调用失败：'+e.message; }
+    };
+    drawParetoAnimated(d);
+    drawGates(d);
+    S.uncHist.push(d.uncertainty); drawUnc();
+  }catch(e){ $('decRunBtn').disabled = false; box.innerHTML = `<span class="text-red-400">失败：${e.message}</span>`; }
+};
+// 帕累托采样动画：灰色采样点逐批涌现（蒙特卡洛可视化），最后落下真实臂均值大点
+function drawParetoAnimated(d){
+  destroyChart('pareto');
+  const pts = d.pareto.points, ranks = d.pareto.ranks, front = d.pareto.front;
+  const arms = Object.keys(pts);
+  const sampleData = {}; arms.forEach(a=> sampleData[a]=[]);
+  const meanData = {}; arms.forEach(a=> meanData[a]=[]);
+  const datasets = [];
+  arms.forEach(a=> datasets.push({label:a+'·MC采样', data:sampleData[a], backgroundColor:'#47556977', pointRadius:2.2}));
+  arms.forEach((a,i)=> datasets.push({label:a, data:meanData[a],
+    backgroundColor: front.includes(a)?PALETTE[i]:'#64748b', pointRadius:0}));
+  // 坐标范围跟随数据（留边），让前沿充满画面
+  const xs = arms.map(a=>pts[a][0]), ys = arms.map(a=>pts[a][1]);
+  let xMin = Math.min(...xs)-0.07, xMax = Math.max(...xs)+0.07;
+  let yMin = Math.max(0, Math.min(...ys)-0.07), yMax = Math.min(1, Math.max(...ys)+0.07);
+  if(xMax-xMin < 0.25){ const c=(xMin+xMax)/2; xMin=c-0.125; xMax=c+0.125; }
+  if(yMax-yMin < 0.20){ const c=(yMin+yMax)/2; yMin=Math.max(0,c-0.10); yMax=Math.min(1,c+0.10); }
+  S.charts.pareto = new Chart($('chartPareto'), {type:'bubble', data:{datasets},
+    options:{...CHART_BASE, plugins:{legend:{display:false}},
+      scales:{x:{...CHART_BASE.scales.x, type:'linear', min:xMin, max:xMax, title:{display:true,text:'生存概率',color:'#64748b'}},
+              y:{...CHART_BASE.scales.y, type:'linear', min:yMin, max:yMax, title:{display:true,text:'乳酸清除（负值=恶化）',color:'#64748b'}}}}});
+  $('paretoLegend').innerHTML = '<span class="text-slate-500">蒙特卡洛采样中…</span>';
+  let tick = 0; const MAXT = 14;
+  const iv = setInterval(()=>{
+    tick++;
+    arms.forEach(a=>{
+      for(let k=0;k<3;k++){
+        sampleData[a].push({x:+(pts[a][0]+(Math.random()-0.5)*0.055).toFixed(3),
+                            y:+(pts[a][1]+(Math.random()-0.5)*0.055).toFixed(3), r:2.2});
+      }
+    });
+    S.charts.pareto.update('none');
+    if(tick>=MAXT){
+      clearInterval(iv);
+      arms.forEach((a,i)=> meanData[a].push({x:pts[a][0], y:pts[a][1], r:6+8*(1-ranks[a]/3)}));
+      S.charts.pareto.update();
+      $('paretoLegend').innerHTML = `第一前沿：<b class="text-emerald-300">${front.join('、')}</b> ｜ 医生权重标量化选择：<b class="text-sky-300">${d.pareto.scalar_choice}</b> ｜ 圆点大小=非支配层级 ｜ 灰点=采样可视化`;
+    }
+  }, 55);
+}
+function drawGates(d){
+  $('gateBox').innerHTML = d.gates.map((g,i)=>
+    `<div class="gate-card flex items-start gap-2 ${g.pass?'bg-emerald-950/40':'bg-red-950/40'}"
+       style="opacity:0;animation:fi .35s ease ${i*140}ms forwards;${g.pass?'border-color:#065f4622':'border-color:#7f1d1d66'}">
+      ${g.pass?'<span class="text-emerald-400" style="flex:none">✓</span>':'<span class="text-red-400" style="flex:none">✗</span>'}
+      <span class="text-slate-300">${g.name}${g.note?`<span class="text-slate-500"> — ${g.note}</span>`:''}</span></div>`).join('');
+  const ob = $('overrideBox'); ob.classList.remove('hidden');
+  $('overrideBtns').innerHTML = ['A','B','AB','D'].filter(a=>a!==d.action).map(a=>
+    `<button class="btn text-[13px]" data-a="${a}">否决并改 ${a}（${{A:'液体',B:'升压药',AB:'联合',D:'暂不处理'}[a]}）</button>`).join('');
+  $('overrideBtns').querySelectorAll('button').forEach(x=> x.onclick = async ()=>{
+    try{
+      const r = await post('/api/decision/override', {decision_id:S.decisionId, new_action:x.dataset.a});
+      $('overrideMsg').innerHTML = `<span class="text-amber-300">✓ ${r.message}（审计已记录，医生拥有最终决策权）</span>`;
+      S.beds[S.curBed] = r.bed;
+    }catch(e){ $('overrideMsg').innerHTML = `<span class="text-red-400">${e.message}</span>`; }
+  });
+}
+/* ================= ④ 反事实推演 ================= */
+async function renderCFTab(){
+  if(!Object.keys(S.beds).length) return;
+  bedChips($('cfBedChips'), S.curBed);
+  $('cfChips').innerHTML = S.cfActions.map((a,i)=>pill(`分支：${a} `, 'pill-blue')+` <a href="#" data-i="${i}" class="text-[13px] text-red-400 cfDel">删除</a>`).join(' ');
+  document.querySelectorAll('.cfDel').forEach(x=> x.onclick = e=>{ e.preventDefault(); S.cfActions.splice(+x.dataset.i,1); renderCFTab(); });
+}
+document.querySelectorAll('.cfAdd').forEach(b=> b.onclick = ()=>{
+  if(!S.cfActions.includes(b.dataset.a) && S.cfActions.length<3) S.cfActions.push(b.dataset.a);
+  renderCFTab();
+});
+$('cfRunBtn').onclick = async ()=>{
+  if(!S.cfActions.length){ alert('请先添加至少一个反事实分支'); return; }
+  $('cfRunBtn').disabled = true;
+  try{
+    const j = await post('/api/counterfactual/run', {bed:S.curBed, cf_actions:S.cfActions});
+    await drawCFAnimated(j.cf);
+  }catch(e){ alert(e.message); }
+  $('cfRunBtn').disabled = false;
+};
+// 双世界曲线从左到右生长，随后结局数字滚动
+async function drawCFAnimated(cf){
+  const brs = Object.entries(cf.branches);
+  const n = brs[0][1].map_mean.length;
+  const labels = Array.from({length:n},(_,i)=>'t+'+i);
+  const mk = (k, cid, key) => {
+    destroyChart(k);
+    S.charts[k] = new Chart($(cid), {type:'line', data:{labels, datasets:brs.map(([i,b],j)=>({
+      label:b.label, data:[], borderColor:PALETTE[j], borderWidth:i==='0'?2.6:1.6,
+      pointRadius:0, tension:.3, borderDash:i==='0'?[]:[6,4]}))}, options:CHART_BASE});
+  };
+  mk('cfmap','chartCFMAP','map'); mk('cflac','chartCFLAC','lac');
+  for(let idx=0; idx<n; idx++){
+    for(const [k, key] of [['cfmap','map'],['cflac','lac']]){
+      const c = S.charts[k];
+      c.data.datasets.forEach((ds,j)=> ds.data.push(brs[j][1][key+'_mean'][idx]));
+      c.update('none');
+    }
+    if(idx % 2 === 0) await sleep(28);
+  }
+  // 结局表 + 数字滚动
+  $('cfTable').innerHTML = `<table class="audit"><thead><tr><th>分支</th><th>动作</th><th>生存概率</th><th>95% CI</th></tr></thead><tbody>` +
+    brs.map(([i,b])=>`<tr><td>${b.label}</td><td><b>${b.action}</b></td>
+      <td><b class="text-sky-300 mono surv-cell" data-v="0">0%</b></td>
+      <td class="text-slate-400">${b.metric_ci.survival.map(v=>(v*100).toFixed(1)+'%').join(' – ')}</td></tr>`).join('') +
+    `</tbody></table>
+     <div class="text-[13px] text-slate-400 mt-2 fadein">${cf.ate_vs_first_cf?`ATE（现实 − 第一反事实分支）：${Object.entries(cf.ate_vs_first_cf).map(([k,v])=>`${{survival:'生存',lactate_clearance:'乳酸清除',fluid_safety:'液体安全'}[k]||k} <b class="text-sky-300 mono">${(v*100).toFixed(1)}pp</b>`).join(' ｜ ')}` : ''} ｜ ${cf.note}</div>`;
+  document.querySelectorAll('.surv-cell').forEach((el,i)=> tweenNum(el, brs[i][1].metric_means.survival*100, 900, v=>v.toFixed(1)+'%'));
+}
+/* ================= ⑤ Harness 进化 ================= */
+async function renderHarness(){
+  loadConfigOnce();
+  try{
+    const cfg = S.cfg || await api('/api/config');
+    const comps = (cfg.harness_registry?.components) || [];
+    $('registryBox').innerHTML = comps.map(c=>
+      `<div class="flex items-start gap-2 py-1.5 border-b border-slate-800">
+        <span class="pill ${c.mutable.length?'pill-blue':'pill-gray'}" style="flex:none">${c.id}</span>
+        <span class="text-slate-300">${c.role}</span>
+        <span class="text-slate-500 text-[12.5px] ml-auto" style="flex:none">${c.mutable.length?'可进化: '+c.mutable.join(','):'锁定'}</span>
+      </div>`).join('') + `<div class="text-[12.5px] text-slate-500 mt-2">共 ${comps.length} 类组件（M1 层递进式 Harness 组件化）</div>`;
+    const st = await api('/api/harness/state');
+    $('harnessState').innerHTML = `generation: ${st.generation}\n` +
+      Object.entries(st.params).map(([k,v])=>`${k}: ${JSON.stringify(v)}`).join('\n');
+    const hist = await api('/api/harness/history');
+    $('evolveHist').innerHTML = hist.slice(-12).reverse().map(h=>
+      `<div class="p-1.5 border-b border-slate-800 ${h.result==='ACCEPTED'?'text-emerald-300':h.result==='REJECTED_ILLEGAL'?'text-red-300':'text-slate-400'}">
+        Gen${h.generation} · ${h.mutated_field} → <b>${h.result}</b>${h.violations?(' · '+h.violations.join(';')):''}</div>`).join('') || '<div class="text-slate-600">尚无进化记录</div>';
+  }catch(e){}
+}
+const STAGES = ['stgPropose','stgGuard','stgProbe','stgCompose'];
+function resetStages(){ STAGES.forEach(id=> $(id).classList.remove('on','done','bad')); }
+async function runEvolve(redteam){
+  resetStages();
+  $('evolveResult').innerHTML = `<span class="text-slate-500">${redteam?'⚠ 注入恶意候选（试图让 LLM 修改决策数值）…':'进化器启动…'}</span>`;
+  const p = post('/api/harness/evolve', {red_team:redteam});
+  $('stgPropose').classList.add('on');
+  await sleep(550);
+  $('stgPropose').classList.replace('on','done');
+  $('stgGuard').classList.add('on');
+  let j;
+  try{ j = await p; }catch(e){ $('stgGuard').classList.replace('on','bad'); $('evolveResult').innerHTML = `<span class="text-red-400">${e.message}</span>`; return; }
+  if(redteam && j.record.result==='REJECTED_ILLEGAL'){
+    $('stgGuard').classList.add('bad');
+    $('stageRow').classList.add('shake'); setTimeout(()=>$('stageRow').classList.remove('shake'), 600);
+  } else $('stgGuard').classList.replace('on','done');
+  await sleep(480);
+  $('stgProbe').classList.add('on'); await sleep(520);
+  $('stgProbe').classList.replace('on','done');
+  $('stgCompose').classList.add('on'); await sleep(430);
+  $('stgCompose').classList.replace('on', j.record.result==='ACCEPTED'?'done':'bad');
+  showEvolve(j);
+}
+$('evolveBtn').onclick = ()=> runEvolve(false);
+$('redteamBtn').onclick = ()=> runEvolve(true);
+function showEvolve(j){
+  const r = j.record;
+  const cls = r.result==='ACCEPTED'?'pill-green':r.result==='REJECTED_ILLEGAL'?'pill-red':'pill-yellow';
+  $('evolveResult').innerHTML = `<div class="fadein space-y-2">
+    <div>结果：${pill(r.result, cls)} <span class="text-[12.5px] text-slate-500">变异字段：${r.mutated_field} ｜ 守卫：${r.guard_passed?'通过':'拦截'}</span></div>
+    ${r.violations?.length?`<div class="text-[13px] text-red-300">${r.violations.join('；')}</div>`:''}
+    ${r.candidate_metric!==undefined?`<div class="text-[13px] text-slate-400">Probe 决策一致率：候选 ${r.candidate_metric} vs 当前 ${r.current_metric}（差值需 ≥ 接受阈值才采纳）</div>`:''}
+    <div class="text-[12.5px] text-slate-500">当前 generation：${j.after.generation} ｜ 决策一致率指标：${j.after.metrics.decision_agreement_rate}</div>
+  </div>`;
+  renderHarness();
+}
+$('rollbackBtn').onclick = async ()=>{
+  try{ await post('/api/harness/rollback'); $('evolveResult').innerHTML = '<span class="text-emerald-300">✓ 已回滚至 Gen0 出厂参数</span>'; renderHarness(); }
+  catch(e){ alert(e.message); }
+};
+
+/* ================= ⑥ 结局反馈 ================= */
+document.querySelectorAll('input[name=fbsrc]').forEach(r=> r.onchange = ()=>{
+  $('fbManualBox').classList.toggle('hidden', r.value!=='manual' || !r.checked);
+});
+async function renderFeedback(){
+  if(!Object.keys(S.beds).length) return;
+  bedChips($('fbBedChips'), S.curBed);
+  drawUnc();
+}
+$('fbBtn').onclick = async ()=>{
+  const src = document.querySelector('input[name=fbsrc]:checked').value;
+  const body = {bed:S.curBed, source:src};
+  if(src==='manual') body.reward = +$('fbRewardVal').textContent;
+  try{
+    const j = await post('/api/outcome/feedback', body);
+    S.beds[S.curBed] = j.bed;
+    $('fbResult').innerHTML = `<div class="fadein">
+      ${pill('✓ 已提交', 'pill-green')} 奖励 = <b class="text-sky-300 mono">${j.reward}</b>（臂 ${j.updated_arm} 后验已更新）<br>
+      <span class="text-[12.5px] text-slate-500">轨迹校验：${j.trajectory_valid?'✓ 通过不变量检查':'✗ '+j.trajectory_msgs.join('；')}</span><br>
+      <span class="text-[12.5px] text-slate-500">合法前缀（M3 SpecAgent 式）：${j.legal_prefix.ok?'✓ 整条轨迹合法（'+j.legal_prefix.prefix_len+'/'+j.legal_prefix.prefix_len+' 步）':'⚠ '+j.legal_prefix.reason}</span></div>`;
+    renderPosterior(j.posterior||[]);
+  }catch(e){ $('fbResult').innerHTML = `<span class="text-red-400">失败：${e.message}</span>`; }
+};
+let curArm = null;
+function renderPosterior(posterior){
+  if(!posterior.length){ $('coefBox').innerHTML = '<div class="text-slate-600 text-[13px]">尚无后验数据——提交一次结局反馈后显示</div>'; $('armChips').innerHTML=''; return; }
+  const arms = [...new Set(posterior.map(c=>c.arm))];
+  if(!arms.includes(curArm)) curArm = arms[0];
+  $('armChips').innerHTML = arms.map(a=>`<button class="btn text-[12.5px] ${a===curArm?'btn-primary':''}" data-arm="${a}">臂 ${a}</button>`).join('');
+  $('armChips').querySelectorAll('button').forEach(x=> x.onclick = ()=>{ curArm = x.dataset.arm; renderPosterior(posterior); });
+  const rows = posterior.filter(c=>c.arm===curArm);
+  const maxAbs = Math.max(...rows.map(c=>Math.abs(+c.mu)), 0.5);
+  $('coefBox').innerHTML = rows.map(c=>{
+    const mu=+c.mu, sd=+c.sd;
+    const pct = Math.abs(mu)<0.005 ? 0 : Math.max(4, Math.min(46, Math.abs(mu)/maxAbs*46));
+    const left = mu>=0 ? 50 : 50-pct, color = mu>=0?'#38bdf8':'#f472b6';
+    return `<div class="flex items-center gap-2 py-[5px]">
+      <span class="w-24 text-slate-400" style="flex:none">${c.feature}</span>
+      <div class="flex-1 relative" style="height:15px">
+        <div style="position:absolute;left:50%;top:0;bottom:0;width:1px;background:#334155"></div>
+        <div class="bar-fill coefbar" data-w="${pct}" style="position:absolute;top:1px;bottom:1px;left:${left}%;width:0%;background:${color}"></div>
+      </div>
+      <span class="mono text-[12px] text-slate-400" style="flex:none;width:118px;text-align:right">μ=${mu.toFixed(2)} σ=${sd.toFixed(2)}</span></div>`;
+  }).join('');
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    document.querySelectorAll('.coefbar').forEach(el=> el.style.width = el.dataset.w+'%');
+  }));
+}
+function drawUnc(){
+  destroyChart('unc');
+  if(!S.uncHist.length) return;
+  S.charts.unc = new Chart($('chartUnc'), {type:'line',
+    data:{labels:S.uncHist.map((_,i)=>'第'+(i+1)+'次决策'),
+      datasets:[{label:'不确定性指数', data:S.uncHist, borderColor:'#fbbf24', pointRadius:3, borderWidth:2, tension:.3},
+                {label:'阈值 60', data:S.uncHist.map(()=>60), borderColor:'#64748b', borderDash:[6,4], pointRadius:0, borderWidth:1}]},
+    options:{...CHART_ANIM, plugins:{legend:{display:false}}}});
+}
+
+/* ================= ⑦ 审计与消息板 ================= */
+async function renderAuditBoard(){
+  try{
+    const j = await api('/api/audit_log');
+    $('toonDemo').textContent = `TOON 压缩演示：JSON ${j.toon_demo.json}B → TOON ${j.toon_demo.toon}B（节省 ${j.toon_demo.saved_pct}%）\n${j.toon_demo.toon_text}`;
+    $('auditBody').innerHTML = j.entries.slice(-40).reverse().map(e=>
+      `<tr><td class="text-slate-500">${e.time?.split(' ')[1]||''}</td><td>${e.event}</td>
+       <td class="text-slate-400">${JSON.stringify(e.payload).slice(0,90)}</td>
+       <td>${e.toon?e.toon.saved_pct+'%':'—'}</td></tr>`).join('') || '<tr><td colspan="4" class="text-slate-600">暂无记录</td></tr>';
+  }catch(e){}
+  await refreshBoard();
+}
+async function refreshBoard(){
+  try{
+    const j = await api('/api/message_board');
+    $('agentState').innerHTML = Object.entries(j.agents||{}).map(([k,v])=>
+      pill(k, v.offline?'pill-red':'pill-gray')+' ').join(' ');
+    $('boardBox').innerHTML = (j.messages||[]).slice().reverse().map(m=>
+      `<div class="p-2 rounded slidein" style="background:#0b1424">
+        <span class="text-sky-300 font-bold text-[13.5px]">${m.agent}</span>
+        <span class="text-slate-600 text-[12px]"> 床${m.bed} · ${m.ts||''}</span>
+        <div class="text-slate-300 mt-0.5 text-[13.5px]" style="white-space:pre-wrap">${m.content}</div></div>`).join('') || '<div class="text-slate-600 text-[13px]">暂无消息</div>';
+  }catch(e){}
+}
+$('consultBtn').onclick = async ()=>{ try{ await post('/api/round_consult'); await refreshBoard(); }catch(e){ alert(e.message); } };
+$('faultBtn').onclick = async ()=>{ try{ const j = await post('/api/message_board/fault_demo'); await refreshBoard(); alert('已演示：'+j.victim+' 掉线 → 消息缓存 → 重连回放'); }catch(e){ alert(e.message); } };
+$('boardSearch').onkeydown = async e=>{
+  if(e.key!=='Enter') return;
+  try{
+    const j = await api('/api/message_board?q='+encodeURIComponent(e.target.value));
+    $('boardBox').innerHTML = (j.messages||[]).map(m=>
+      `<div class="p-2 rounded" style="background:#0b1424"><span class="text-sky-300 font-bold text-[13.5px]">${m.agent}</span><div class="text-slate-300 mt-0.5 text-[13.5px]" style="white-space:pre-wrap">${m.content}</div></div>`).join('') || '<div class="text-slate-600 text-[13px]">无匹配</div>';
+  }catch(err){}
+};
+
+/* ================= ⑧ 可信度与解释 ================= */
+async function renderCalib(){
+  try{
+    const j = await api('/api/calibration');
+    destroyChart('ece');
+    const bins = j.bins.filter(b=>b.n>0).map(b=>({x:(b.bin+0.5)/10, pred:b.pred, obs:b.obs}));
+    S.charts.ece = new Chart($('chartECE'), {type:'bar',
+      data:{datasets:[
+        {label:'模型预测', data:bins.map(b=>({x:b.x, y:b.pred})), backgroundColor:'#0ea5e9aa'},
+        {label:'实际观测', data:bins.map(b=>({x:b.x+0.02, y:b.obs})), backgroundColor:'#a3e635aa'}]},
+      options:{...CHART_ANIM, scales:{x:{...CHART_ANIM.scales.x, type:'linear', min:0, max:1, title:{display:true,text:'预测概率',color:'#64748b'}},
+                                        y:{...CHART_ANIM.scales.y, min:0, max:1, title:{display:true,text:'频率',color:'#64748b'}}}}});
+    $('eceScore').innerHTML = `ECE = <b class="text-sky-300 mono">${j.ece}</b>（期望校准误差，越小越好；n=${j.n} 模拟队列）<br><span class="text-[12.5px] text-slate-500">${j.note}。当前策略后验随结局反馈更新，校准随之变化。</span>`;
+    destroyChart('dca');
+    const d = j.dca;
+    S.charts.dca = new Chart($('chartDCA'), {type:'line',
+      data:{labels:d.map(x=>x.pt), datasets:[
+        {label:'模型', data:d.map(x=>x.model), borderColor:'#38bdf8', pointRadius:0, borderWidth:2},
+        {label:'全部干预', data:d.map(x=>x.treat_all), borderColor:'#f472b6', borderDash:[5,4], pointRadius:0},
+        {label:'不干预', data:d.map(x=>x.treat_none), borderColor:'#64748b', borderDash:[2,3], pointRadius:0}]},
+      options:{...CHART_ANIM, scales:{x:{...CHART_ANIM.scales.x, type:'linear', title:{display:true,text:'阈值概率',color:'#64748b'}},
+                                        y:{...CHART_ANIM.scales.y, title:{display:true,text:'净获益',color:'#64748b'}}}}});
+  }catch(e){}
+  await drawShap();
+  if(Object.keys(S.beds).length) bedChips($('shapBedChips'), S.curBed);
+}
+async function drawShap(){
+  if(!Object.keys(S.beds).length) return;
+  try{
+    const j = await api('/api/shap?bed='+S.curBed);
+    destroyChart('shap');
+    const vals = j.shapley.slice().sort((a,b)=>Math.abs(a.phi)-Math.abs(b.phi));
+    S.charts.shap = new Chart($('chartShap'), {type:'bar',
+      data:{labels:vals.map(v=>v.feature), datasets:[{label:'Shapley φ', data:vals.map(v=>v.phi),
+        backgroundColor:vals.map(v=>v.phi>=0?'#38bdf8aa':'#f472b6aa')}]},
+      options:{...CHART_ANIM, indexAxis:'y', plugins:{legend:{display:false}},
+        scales:{x:{...CHART_ANIM.scales.x, title:{display:true,text:'对 P(结局) 的贡献',color:'#64748b'}}, y:{...CHART_ANIM.scales.y}}}});
+    const allZero = j.shapley.every(v=>Math.abs(v.phi)<1e-6);
+    $('shapNote').textContent = j.note + (allZero?'（当前后验尚未更新——先在「结局反馈」页提交几例反馈，Shapley 值将体现各特征的真实贡献）':'');
+  }catch(e){}
+}
+$('shapBtn').onclick = drawShap;
+
+/* ================= 启动 ================= */
+refreshHealth(); loadConfigOnce();
+</script>
+</body>
+</html>

@@ -1,0 +1,10 @@
+{
+  "comment": "不变约束：代码级硬编码守卫。任何 Harness 候选版本触碰任一条即判为非法进化，直接拒绝并留痕。守卫逻辑见 core/harness_evolver.py 的 check_invariants()。",
+  "rules": [
+    {"id": "INV-1", "name": "去甲肾上腺素剂量上限", "check": "ne_dose_max", "value": 1.0, "unit": "μg/kg/min", "desc": "任何分支中模拟与推荐的去甲肾上腺素剂量不得超过 1.0 μg/kg/min。"},
+    {"id": "INV-2", "name": "晶体液累积量上限", "check": "fluid_total_max", "value": 5000, "unit": "mL/24h（演示折算按步数）", "desc": "单病例模拟累积晶体液不得超过 5000 mL 演示上限。"},
+    {"id": "INV-3", "name": "LLM 决策隔离", "check": "llm_decision_isolation", "value": true, "desc": "LLM 输出不得参与任何决策数值计算；决策必须先于文本生成（order_flip_gate 结构强制）。"},
+    {"id": "INV-4", "name": "临床均势池边界", "check": "equipoise_boundary", "value": true, "desc": "自适应随机化只能在 config/pool_config.json 定义的均势选项池内执行，不得新增/删除选项。"},
+    {"id": "INV-5", "name": "模拟数据边界", "check": "simulation_only", "value": true, "desc": "系统不得接受任何外部真实患者数据接口；仅允许使用内置模拟器与 CSV 回放。"}
+  ]
+}

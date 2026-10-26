@@ -1,0 +1,20 @@
+{
+  "comment": "Harness 组件注册表：Harness 递归进化的作用范围。evolver 只能变异 mutable 字段，immutable 字段由注册表锁定。",
+  "version": "1.0.0",
+  "components": [
+    {"id": "prompt_interpret", "role": "决策解读提示词模板", "mutable": ["template_text", "style"], "immutable": ["forbidden: 修改决策数值"]},
+    {"id": "review_threshold", "role": "Fresh 复核分歧告警阈值", "mutable": ["threshold"], "immutable": ["range: 0-100"]},
+    {"id": "retrieval_topk", "role": "向量检索返回证据条数", "mutable": ["top_k"], "immutable": ["range: 1-5"]},
+    {"id": "ts_sample_count", "role": "Thompson 采样蒙特卡洛次数", "mutable": ["n_mc"], "immutable": ["range: 500-10000"]},
+    {"id": "replay_ratio", "role": "经验回灌注入比例", "mutable": ["ratio"], "immutable": ["range: 0-0.5"]},
+    {"id": "counterfactual_rollouts", "role": "反事实推演强度（每分支蒙特卡洛次数）", "mutable": ["n_rollouts"], "immutable": ["range: 5-50"]},
+    {"id": "equipoise_pool", "role": "临床均势选项池", "mutable": [], "immutable": ["完全锁定，见 INV-4"]},
+    {"id": "invariant_rules", "role": "不变约束集", "mutable": [], "immutable": ["完全锁定，任何候选不得触碰"]}
+  ],
+  "evolver": {
+    "probe_patients": 10,
+    "metric": "decision_agreement_rate",
+    "accept_margin": 0.0,
+    "max_history": 20
+  }
+}

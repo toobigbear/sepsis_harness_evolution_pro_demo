@@ -1,0 +1,14 @@
+{
+  "snippets": [
+    {"id": "K1", "topic": "初始复苏", "text": "SSC 2021：脓毒性休克初始复苏目标 MAP 65 mmHg；首先给予 30 mL/kg 晶体液的激惹性补液建议需结合容量反应性动态评估。", "source": "Surviving Sepsis Campaign 2021"},
+    {"id": "K2", "topic": "血管活性药", "text": "SSC 2021：去甲肾上腺素是一线血管活性药物；剂量可滴定至 MAP 达标，通常上限约 0.5–1.0 μg/kg/min（个体化）。", "source": "Surviving Sepsis Campaign 2021"},
+    {"id": "K3", "topic": "乳酸监测", "text": "SSC 2021：动态监测乳酸，指导复苏以降低病死率；乳酸清除率与预后相关。", "source": "Surviving Sepsis Campaign 2021"},
+    {"id": "K4", "topic": "液体安全", "text": "液体过负荷与 AKI、ARDS、病死率升高相关；复苏后应采用保守/去复苏液体策略。", "source": "Fluid stewardship literature"},
+    {"id": "K5", "topic": "氢化可的松", "text": "SSC 2021：对需较大剂量升压药仍难以纠正的休克，建议静脉氢化可的松 200 mg/d。", "source": "Surviving Sepsis Campaign 2021"},
+    {"id": "K6", "topic": "肾脏替代", "text": "SSC 2021：RRT 常规适应证（难治性高钾、酸中毒、容量过负荷合并少尿等）达成时启动。", "source": "Surviving Sepsis Campaign 2021"},
+    {"id": "K7", "topic": "SOFA 评分", "text": "SOFA 评分量化器官功能障碍程度，每增加 1 分病死率显著上升，是脓毒症严重程度的核心度量。", "source": "Sepsis-3 定义（JAMA 2016）"},
+    {"id": "K8", "topic": "临床均势", "text": "自适应随机化仅适用于临床专家确认的均势选项池内；存在禁忌或明确更优证据时应直接推荐，不进行随机。", "source": "ICM 2026 述评（Elbers/Ercole/Angus）"},
+    {"id": "K9", "topic": "抗菌药物", "text": "SSC 2021：疑似脓毒性休克应在识别后 1 小时内给药；每日评估降阶梯可能。", "source": "Surviving Sepsis Campaign 2021"},
+    {"id": "K10", "topic": "感染源控制", "text": "应尽快明确感染源并实施源控制（引流/清创/移除感染装置），延迟与不良预后相关。", "source": "Surviving Sepsis Campaign 2021"}
+  ]
+}

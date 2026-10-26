@@ -1,0 +1,39 @@
+{
+  "phenotypes": [
+    {
+      "id": "fluid_responder", "label": "补液反应型",
+      "starling_gain": 1.5, "svr_gain": 0.8, "contractility": 1.0,
+      "preload_range": [0.40, 0.48], "svr_base": 0.60,
+      "hint": "Frank-Starling 曲线陡段，前负荷增加可明显提升每搏量。"
+    },
+    {
+      "id": "pressor_responder", "label": "血管麻痹/升压药反应型",
+      "starling_gain": 0.9, "svr_gain": 1.8, "contractility": 1.0,
+      "preload_range": [0.78, 0.86], "svr_base": 0.45,
+      "hint": "外周血管张力低，对去甲肾上腺素敏感。"
+    },
+    {
+      "id": "mixed", "label": "混合型",
+      "starling_gain": 1.0, "svr_gain": 1.0, "contractility": 1.0,
+      "preload_range": [0.62, 0.72], "svr_base": 0.60,
+      "hint": "对两种干预均有一定反应。"
+    },
+    {
+      "id": "cardiac_suppressed", "label": "心肌抑制型",
+      "starling_gain": 0.9, "svr_gain": 1.0, "contractility": 0.55,
+      "preload_range": [0.90, 1.10], "svr_base": 0.60,
+      "hint": "心肌收缩力受损，单纯补液/升压获益有限，液体过负荷风险高。"
+    }
+  ],
+  "precision_levels": {
+    "low":  {"label": "低（教学演示）", "substeps": 1, "noise": 1.0, "pk_coupling": false, "lactate_dynamics": false},
+    "mid":  {"label": "中（平衡）",     "substeps": 2, "noise": 0.7, "pk_coupling": true,  "lactate_dynamics": true},
+    "high": {"label": "高（精细模拟）", "substeps": 4, "noise": 0.4, "pk_coupling": true,  "lactate_dynamics": true}
+  },
+  "vitals": {
+    "map0": [59, 64], "hr0": [100, 120], "lactate0": [3.7, 4.5],
+    "urine0": [18, 26], "ne0": [0.22, 0.30], "sofa0": [8, 10],
+    "spo2": [90, 95], "rr": [20, 28], "cvp": [5, 11]
+  },
+  "outcome_survival_baseline": {"good": 0.85, "poor": 0.35}
+}

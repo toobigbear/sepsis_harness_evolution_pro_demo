@@ -1,0 +1,48 @@
+{
+  "project": "SepsisICU-Harness Pro（第三波·Pro：数字孪生预演增强）",
+  "decision_points": [
+    {
+      "id": "T1",
+      "name": "T1 初始复苏完成后",
+      "question": "优先补液扩容 还是 优先上调去甲肾上腺素？",
+      "options": [
+        {"id": "A", "name": "优先晶体液扩容", "desc": "评估容量反应性后优先给予晶体液，恢复有效循环血量。"},
+        {"id": "B", "name": "优先上调去甲肾上腺素", "desc": "优先上调去甲肾上腺素剂量，尽快恢复灌注压与器官灌注。"},
+        {"id": "AB", "name": "联合：适量补液 + 同步上调升压药", "desc": "小剂量联合策略，兼顾容量与血管张力。"}
+      ]
+    },
+    {
+      "id": "T2",
+      "name": "T2 复苏后 24h 内",
+      "question": "是否加用氢化可的松？",
+      "options": [
+        {"id": "C", "name": "加用氢化可的松 200mg/d", "desc": "符合 SSC 建议的难治性休克辅助用药情境。"},
+        {"id": "D", "name": "暂不加用，继续优化容量与升压药", "desc": "继续标准复苏，严密观察乳酸与灌注趋势。"}
+      ]
+    }
+  ],
+  "t3_knowledge_only": {
+    "id": "T3",
+    "name": "T3 全程伴随（知识图谱辅助，不进决策算法）",
+    "question": "抗生素是否升级 / 感染源控制是否到位？",
+    "note": "仅展示指南知识与药物知识图谱关联，不参与 MAB 决策计算。"
+  },
+  "default_threshold": 60,
+  "default_doctor_weights": {"survival": 0.5, "lactate_clearance": 0.3, "fluid_safety": 0.2},
+  "reward_weights_note": "演示默认权重；真实项目必须由 ICU 临床专家组确定。",
+  "mab": {
+    "feature_names": ["age_norm", "sofa", "lactate", "map", "urine", "ne_dose", "comorbidity", "cvp", "fluid_response"],
+    "feature_labels": ["年龄", "SOFA 评分", "乳酸", "MAP", "尿量", "去甲肾剂量", "合并症数", "CVP", "容量反应性"],
+    "prior_mu": 0.0,
+    "prior_sigma_scale": 1.5,
+    "n_mc": 2000,
+    "horizon_steps": 6,
+    "rollouts_per_candidate": 8,
+    "cf_rollouts": 20
+  },
+  "objectives": [
+    {"id": "survival", "label": "28 天生存概率", "dir": "max"},
+    {"id": "lactate_clearance", "label": "乳酸清除率", "dir": "max"},
+    {"id": "fluid_safety", "label": "液体安全（1-过负荷风险）", "dir": "max"}
+  ]
+}

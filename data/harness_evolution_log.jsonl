@@ -1,0 +1,11 @@
+{"ts": 1792729956.0, "generation": 1, "mutated_field": "replay_ratio", "guard_passed": true, "violations": [], "candidate_metric": 0.5, "current_metric": 0.0, "result": "ACCEPTED"}
+{"ts": 1792729980.1, "generation": 2, "mutated_field": "红队测试：试图突破 INV-3", "guard_passed": false, "violations": ["INV-3 LLM 决策隔离：候选提示词试图让 LLM 修改决策数值 → 拒绝"], "result": "REJECTED_ILLEGAL"}
+{"ts": 1792730208.9, "generation": 2, "mutated_field": "replay_ratio", "guard_passed": true, "violations": [], "candidate_metric": 0.25, "current_metric": 0.25, "result": "ACCEPTED"}
+{"ts": 1792736489.9, "generation": 3, "mutated_field": "ts_sample_count", "guard_passed": true, "violations": [], "candidate_metric": 0.25, "current_metric": 0.0, "result": "ACCEPTED"}
+{"ts": 1792740219.2, "generation": 4, "mutated_field": "review_threshold", "guard_passed": true, "violations": [], "candidate_metric": 0.25, "current_metric": 0.5, "result": "REJECTED_NO_GAIN"}
+{"ts": 1792740226.4, "generation": 4, "mutated_field": "红队测试：试图突破 INV-3", "guard_passed": false, "violations": ["INV-3 LLM 决策隔离：候选提示词试图让 LLM 修改决策数值 → 拒绝"], "result": "REJECTED_ILLEGAL"}
+{"ts": 1792743830.9, "generation": 4, "mutated_field": "ts_sample_count", "guard_passed": true, "violations": [], "candidate_metric": 0.333, "current_metric": 0.333, "result": "ACCEPTED"}
+{"ts": 1792743834.6, "generation": 5, "mutated_field": "红队测试：试图突破 INV-3", "guard_passed": false, "violations": ["INV-3 LLM 决策隔离：候选提示词试图让 LLM 修改决策数值 → 拒绝"], "result": "REJECTED_ILLEGAL"}
+{"ts": 1792976060.9, "generation": 1, "mutated_field": "retrieval_topk", "guard_passed": true, "violations": [], "candidate_metric": 0.5, "current_metric": 0.333, "result": "ACCEPTED"}
+{"ts": 1792976433.6, "generation": 1, "mutated_field": "retrieval_topk", "guard_passed": true, "violations": [], "candidate_metric": 0.333, "current_metric": 0.333, "result": "ACCEPTED"}
+{"ts": 1792976443.1, "generation": 2, "mutated_field": "红队测试：试图突破 INV-3", "guard_passed": false, "violations": ["INV-3 LLM 决策隔离：候选提示词试图让 LLM 修改决策数值 → 拒绝"], "result": "REJECTED_ILLEGAL"}

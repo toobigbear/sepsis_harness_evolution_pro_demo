@@ -1,0 +1,87 @@
+{"ts": 1792725665.9, "agent": "Harness调度器", "bed": 0, "kind": "session", "content": "会话 S112105 开启：2 床 · 精度档 mid · 自动生成模式", "refs": []}
+{"ts": 1792729226.4, "agent": "Harness调度器", "bed": 0, "kind": "session", "content": "会话 S122026 开启：2 床 · 精度档 high · 自动生成模式", "refs": []}
+{"ts": 1792729536.0, "agent": "Harness调度器", "bed": 2, "kind": "decision", "content": "T1 执行：A（液体复苏）· 分支 recommend · 不确定性 70.1", "refs": []}
+{"ts": 1792729557.2, "agent": "Harness调度器", "bed": 1, "kind": "decision", "content": "T1 执行：AB（联合）· 分支 recommend · 不确定性 69.8", "refs": []}
+{"ts": 1792729572.1, "agent": "Harness调度器", "bed": 2, "kind": "decision", "content": "T1 执行：B（血管活性药）· 分支 recommend · 不确定性 68.9", "refs": []}
+{"ts": 1792729575.8, "agent": "Harness调度器", "bed": 1, "kind": "decision", "content": "T1 执行：AB（联合）· 分支 recommend · 不确定性 67.6", "refs": []}
+{"ts": 1792729595.0, "agent": "Harness调度器", "bed": 1, "kind": "decision", "content": "T1 执行：B（血管活性药）· 分支 gated · 不确定性 67.3", "refs": []}
+{"ts": 1792729778.7, "agent": "Harness调度器", "bed": 1, "kind": "decision", "content": "T1 执行：AB（联合）· 分支 randomize · 不确定性 67.1", "refs": []}
+{"ts": 1792729798.7, "agent": "Harness调度器", "bed": 1, "kind": "decision", "content": "T1 执行：A（液体复苏）· 分支 gated · 不确定性 70.5", "refs": []}
+{"ts": 1792729810.0, "agent": "Harness调度器", "bed": 1, "kind": "decision", "content": "T1 执行：A（液体复苏）· 分支 gated · 不确定性 68.8", "refs": []}
+{"ts": 1792729834.2, "agent": "Harness调度器", "bed": 1, "kind": "override", "content": "医生否决：A → AB（联合）", "refs": []}
+{"ts": 1792730230.0, "agent": "Harness调度器", "bed": 1, "kind": "feedback", "content": "结局反馈：动作 AB 奖励 0.012 → 后验已更新（经验回灌 RSI 三层之 L1 即时）", "refs": []}
+{"ts": 1792730235.2, "agent": "Harness调度器", "bed": 2, "kind": "feedback", "content": "结局反馈：动作 B 奖励 0.819 → 后验已更新（经验回灌 RSI 三层之 L1 即时）", "refs": []}
+{"ts": 1792730267.2, "agent": "检验Agent", "bed": 1, "kind": "observation", "content": "乳酸 24.42 mmol/L 偏高，建议 2-4h 复查动态趋势；结合 ScvO2 评估灌注。", "refs": ["检验Agent"]}
+{"ts": 1792730267.2, "agent": "检验Agent", "bed": 1, "kind": "observation", "content": "尿量 1.6 mL/h 偏少，警惕 AKI：监测肌酐、必要时床旁超声评估容量。", "refs": ["检验Agent"]}
+{"ts": 1792730267.2, "agent": "床旁护士Agent", "bed": 1, "kind": "observation", "content": "MAP 39.0 mmHg 低于目标 65：核对血管活性药通路/浓度，避免间断中断。", "refs": ["床旁护士Agent"]}
+{"ts": 1792730267.2, "agent": "微生物Agent", "bed": 1, "kind": "observation", "content": "血培养（模拟）：革兰阴性杆菌阳性，待药敏结果；经验覆盖建议参照本院耐药谱。", "refs": ["微生物Agent"]}
+{"ts": 1792730267.2, "agent": "影像Agent", "bed": 1, "kind": "observation", "content": "床旁超声（模拟）：下腔静脉变异度小、心室充盈可，提示容量反应性有限。", "refs": ["影像Agent"]}
+{"ts": 1792733689.0, "agent": "Harness调度器", "bed": 0, "kind": "session", "content": "会话 S133449 开启：3 床 · 精度档 mid · 自动生成模式", "refs": []}
+{"ts": 1792734938.7, "agent": "Harness调度器", "bed": 2, "kind": "decision", "content": "T1 执行：A（液体复苏）· 分支 randomize · 不确定性 83.1", "refs": []}
+{"ts": 1792734999.0, "agent": "Harness调度器", "bed": 2, "kind": "decision", "content": "T1 执行：A（液体复苏）· 分支 randomize · 不确定性 87.0", "refs": []}
+{"ts": 1792735073.3, "agent": "Harness调度器", "bed": 2, "kind": "decision", "content": "T1 执行：B（血管活性药）· 分支 randomize · 不确定性 88.7", "refs": []}
+{"ts": 1792735147.0, "agent": "Harness调度器", "bed": 2, "kind": "decision", "content": "T1 执行：B（血管活性药）· 分支 randomize · 不确定性 87.5", "refs": []}
+{"ts": 1792735288.8, "agent": "Harness调度器", "bed": 2, "kind": "override", "content": "医生否决：B → AB（联合）", "refs": []}
+{"ts": 1792735675.7, "agent": "Harness调度器", "bed": 2, "kind": "override", "content": "医生否决：AB → A（液体复苏）", "refs": []}
+{"ts": 1792735692.2, "agent": "Harness调度器", "bed": 2, "kind": "decision", "content": "T1 执行：B（血管活性药）· 分支 randomize · 不确定性 89.1", "refs": []}
+{"ts": 1792735715.2, "agent": "Harness调度器", "bed": 2, "kind": "decision", "content": "T1 执行：B（血管活性药）· 分支 randomize · 不确定性 87.6", "refs": []}
+{"ts": 1792735727.6, "agent": "Harness调度器", "bed": 2, "kind": "override", "content": "医生否决：B → D（暂不处理）", "refs": []}
+{"ts": 1792741182.3, "agent": "Harness调度器", "bed": 0, "kind": "session", "content": "会话 S153942 开启：3 床 · 精度档 mid · 自动生成模式", "refs": []}
+{"ts": 1792741183.9, "agent": "Harness调度器", "bed": 0, "kind": "session", "content": "会话 S153943 开启：3 床 · 精度档 high · 自动生成模式", "refs": []}
+{"ts": 1792741225.0, "agent": "Harness调度器", "bed": 1, "kind": "decision", "content": "T1 执行：AB（联合）· 分支 randomize · 不确定性 86.4", "refs": []}
+{"ts": 1792741240.5, "agent": "Harness调度器", "bed": 1, "kind": "decision", "content": "T1 执行：B（血管活性药）· 分支 randomize · 不确定性 88.4", "refs": []}
+{"ts": 1792742896.6, "agent": "Harness调度器", "bed": 1, "kind": "feedback", "content": "结局反馈：动作 B 奖励 0.21 → 后验已更新（经验回灌 RSI 三层之 L1 即时）", "refs": []}
+{"ts": 1792742900.1, "agent": "Harness调度器", "bed": 1, "kind": "feedback", "content": "结局反馈：动作 B 奖励 0.21 → 后验已更新（经验回灌 RSI 三层之 L1 即时）", "refs": []}
+{"ts": 1792743499.7, "agent": "检验Agent", "bed": 1, "kind": "observation", "content": "乳酸 6.58 mmol/L 偏高，建议 2-4h 复查动态趋势；结合 ScvO2 评估灌注。", "refs": ["检验Agent"]}
+{"ts": 1792743499.7, "agent": "检验Agent", "bed": 1, "kind": "observation", "content": "尿量 1.3 mL/h 偏少，警惕 AKI：监测肌酐、必要时床旁超声评估容量。", "refs": ["检验Agent"]}
+{"ts": 1792743499.7, "agent": "床旁护士Agent", "bed": 1, "kind": "observation", "content": "MAP 41.4 mmHg 低于目标 65：核对血管活性药通路/浓度，避免间断中断。", "refs": ["床旁护士Agent"]}
+{"ts": 1792743499.7, "agent": "检验Agent", "bed": 2, "kind": "observation", "content": "乳酸 4.47 mmol/L 偏高，建议 2-4h 复查动态趋势；结合 ScvO2 评估灌注。", "refs": ["检验Agent"]}
+{"ts": 1792743499.7, "agent": "检验Agent", "bed": 2, "kind": "observation", "content": "尿量 19.1 mL/h 偏少，警惕 AKI：监测肌酐、必要时床旁超声评估容量。", "refs": ["检验Agent"]}
+{"ts": 1792743499.7, "agent": "床旁护士Agent", "bed": 2, "kind": "observation", "content": "MAP 59.3 mmHg 低于目标 65：核对血管活性药通路/浓度，避免间断中断。", "refs": ["床旁护士Agent"]}
+{"ts": 1792743499.7, "agent": "检验Agent", "bed": 3, "kind": "observation", "content": "乳酸 4.19 mmol/L 偏高，建议 2-4h 复查动态趋势；结合 ScvO2 评估灌注。", "refs": ["检验Agent"]}
+{"ts": 1792743499.7, "agent": "检验Agent", "bed": 3, "kind": "observation", "content": "尿量 19.6 mL/h 偏少，警惕 AKI：监测肌酐、必要时床旁超声评估容量。", "refs": ["检验Agent"]}
+{"ts": 1792743499.7, "agent": "床旁护士Agent", "bed": 3, "kind": "observation", "content": "MAP 59.0 mmHg 低于目标 65：核对血管活性药通路/浓度，避免间断中断。", "refs": ["床旁护士Agent"]}
+{"ts": 1792743499.7, "agent": "微生物Agent", "bed": 1, "kind": "observation", "content": "血培养（模拟）：革兰阴性杆菌阳性，待药敏结果；经验覆盖建议参照本院耐药谱。", "refs": ["微生物Agent"]}
+{"ts": 1792743499.7, "agent": "影像Agent", "bed": 1, "kind": "observation", "content": "床旁超声（模拟）：下腔静脉变异度小、心室充盈可，提示容量反应性有限。", "refs": ["影像Agent"]}
+{"ts": 1792743568.3, "agent": "Harness调度器", "bed": 0, "kind": "alert", "content": "检测到 影像Agent 心跳丢失，已切换掉线容错模式（消息缓存待重连）", "refs": []}
+{"ts": 1792743568.3, "agent": "Harness调度器", "bed": 0, "kind": "note", "content": "影像Agent 已重连，缓存消息按序回放 ✓", "refs": []}
+{"ts": 1792743772.6, "agent": "Harness调度器", "bed": 0, "kind": "session", "content": "会话 S162252 开启：2 床 · 精度档 mid · 自动生成模式", "refs": []}
+{"ts": 1792743800.6, "agent": "Harness调度器", "bed": 1, "kind": "decision", "content": "T1 执行：AB（联合）· 分支 randomize · 不确定性 85.3", "refs": []}
+{"ts": 1792743802.5, "agent": "Harness调度器", "bed": 2, "kind": "decision", "content": "T1 执行：B（血管活性药）· 分支 gated · 不确定性 96.4", "refs": []}
+{"ts": 1792743809.3, "agent": "Harness调度器", "bed": 2, "kind": "override", "content": "医生否决：B → A（液体复苏）", "refs": []}
+{"ts": 1792743811.5, "agent": "Harness调度器", "bed": 2, "kind": "override", "content": "医生否决：A → AB（联合）", "refs": []}
+{"ts": 1792743840.8, "agent": "Harness调度器", "bed": 1, "kind": "feedback", "content": "结局反馈：动作 AB 奖励 0.21 → 后验已更新（经验回灌 RSI 三层之 L1 即时）", "refs": []}
+{"ts": 1792743845.5, "agent": "Harness调度器", "bed": 2, "kind": "feedback", "content": "结局反馈：动作 AB 奖励 0.793 → 后验已更新（经验回灌 RSI 三层之 L1 即时）", "refs": []}
+{"ts": 1792743848.3, "agent": "检验Agent", "bed": 1, "kind": "observation", "content": "乳酸 5.86 mmol/L 偏高，建议 2-4h 复查动态趋势；结合 ScvO2 评估灌注。", "refs": ["检验Agent"]}
+{"ts": 1792743848.3, "agent": "检验Agent", "bed": 1, "kind": "observation", "content": "尿量 1.5 mL/h 偏少，警惕 AKI：监测肌酐、必要时床旁超声评估容量。", "refs": ["检验Agent"]}
+{"ts": 1792743848.3, "agent": "床旁护士Agent", "bed": 1, "kind": "observation", "content": "MAP 43.3 mmHg 低于目标 65：核对血管活性药通路/浓度，避免间断中断。", "refs": ["床旁护士Agent"]}
+{"ts": 1792743848.3, "agent": "微生物Agent", "bed": 1, "kind": "observation", "content": "血培养（模拟）：革兰阴性杆菌阳性，待药敏结果；经验覆盖建议参照本院耐药谱。", "refs": ["微生物Agent"]}
+{"ts": 1792743848.3, "agent": "影像Agent", "bed": 1, "kind": "observation", "content": "床旁超声（模拟）：下腔静脉变异度小、心室充盈可，提示容量反应性有限。", "refs": ["影像Agent"]}
+{"ts": 1792743849.5, "agent": "Harness调度器", "bed": 0, "kind": "alert", "content": "检测到 微生物Agent 心跳丢失，已切换掉线容错模式（消息缓存待重连）", "refs": []}
+{"ts": 1792743849.5, "agent": "Harness调度器", "bed": 0, "kind": "note", "content": "微生物Agent 已重连，缓存消息按序回放 ✓", "refs": []}
+{"ts": 1792975039.1, "agent": "Harness调度器", "bed": 0, "kind": "session", "content": "会话 S083719 开启：2 床 · 精度档 mid · 自动生成模式", "refs": []}
+{"ts": 1792975765.1, "agent": "Harness调度器", "bed": 0, "kind": "session", "content": "会话 S084925 开启：3 床 · 精度档 mid · 自动生成模式", "refs": []}
+{"ts": 1792975902.6, "agent": "Harness调度器", "bed": 1, "kind": "decision", "content": "T1 执行：B（血管活性药）· 分支 recommend · 不确定性 70.2", "refs": []}
+{"ts": 1792975940.7, "agent": "Harness调度器", "bed": 1, "kind": "decision", "content": "T1 执行：AB（联合）· 分支 randomize · 不确定性 69.5", "refs": []}
+{"ts": 1792975978.7, "agent": "Harness调度器", "bed": 1, "kind": "decision", "content": "T1 执行：B（血管活性药）· 分支 randomize · 不确定性 68.3", "refs": []}
+{"ts": 1792976002.2, "agent": "Harness调度器", "bed": 1, "kind": "override", "content": "医生否决：B → AB（联合）", "refs": []}
+{"ts": 1792976241.5, "agent": "Harness调度器", "bed": 0, "kind": "session", "content": "会话 S085721 开启：3 床 · 精度档 mid · 自动生成模式", "refs": []}
+{"ts": 1792976311.7, "agent": "Harness调度器", "bed": 1, "kind": "decision", "content": "T1 执行：B（血管活性药）· 分支 gated · 不确定性 68.9", "refs": []}
+{"ts": 1792976355.3, "agent": "Harness调度器", "bed": 1, "kind": "decision", "content": "T1 执行：B（血管活性药）· 分支 randomize · 不确定性 72.0", "refs": []}
+{"ts": 1792976378.0, "agent": "Harness调度器", "bed": 1, "kind": "decision", "content": "T1 执行：B（血管活性药）· 分支 randomize · 不确定性 71.5", "refs": []}
+{"ts": 1792976385.2, "agent": "Harness调度器", "bed": 1, "kind": "override", "content": "医生否决：B → AB（联合）", "refs": []}
+{"ts": 1792976460.4, "agent": "Harness调度器", "bed": 1, "kind": "feedback", "content": "结局反馈：动作 AB 奖励 0.21 → 后验已更新（经验回灌 RSI 三层之 L1 即时）", "refs": []}
+{"ts": 1792976504.1, "agent": "检验Agent", "bed": 1, "kind": "observation", "content": "乳酸 8.63 mmol/L 偏高，建议 2-4h 复查动态趋势；结合 ScvO2 评估灌注。", "refs": ["检验Agent"]}
+{"ts": 1792976504.1, "agent": "检验Agent", "bed": 1, "kind": "observation", "content": "尿量 1.3 mL/h 偏少，警惕 AKI：监测肌酐、必要时床旁超声评估容量。", "refs": ["检验Agent"]}
+{"ts": 1792976504.1, "agent": "床旁护士Agent", "bed": 1, "kind": "observation", "content": "MAP 44.2 mmHg 低于目标 65：核对血管活性药通路/浓度，避免间断中断。", "refs": ["床旁护士Agent"]}
+{"ts": 1792976504.1, "agent": "检验Agent", "bed": 2, "kind": "observation", "content": "乳酸 3.8 mmol/L 偏高，建议 2-4h 复查动态趋势；结合 ScvO2 评估灌注。", "refs": ["检验Agent"]}
+{"ts": 1792976504.1, "agent": "微生物Agent", "bed": 1, "kind": "observation", "content": "血培养（模拟）：革兰阴性杆菌阳性，待药敏结果；经验覆盖建议参照本院耐药谱。", "refs": ["微生物Agent"]}
+{"ts": 1792976504.1, "agent": "影像Agent", "bed": 1, "kind": "observation", "content": "床旁超声（模拟）：下腔静脉变异度小、心室充盈可，提示容量反应性有限。", "refs": ["影像Agent"]}
+{"ts": 1792976520.6, "agent": "Harness调度器", "bed": 0, "kind": "alert", "content": "检测到 检验Agent 心跳丢失，已切换掉线容错模式（消息缓存待重连）", "refs": []}
+{"ts": 1792976520.6, "agent": "Harness调度器", "bed": 0, "kind": "note", "content": "检验Agent 已重连，缓存消息按序回放 ✓", "refs": []}
+{"ts": 1792994120.5, "agent": "检验Agent", "bed": 1, "kind": "observation", "content": "乳酸 8.63 mmol/L 偏高，建议 2-4h 复查动态趋势；结合 ScvO2 评估灌注。", "refs": ["检验Agent"]}
+{"ts": 1792994120.5, "agent": "检验Agent", "bed": 1, "kind": "observation", "content": "尿量 1.3 mL/h 偏少，警惕 AKI：监测肌酐、必要时床旁超声评估容量。", "refs": ["检验Agent"]}
+{"ts": 1792994120.5, "agent": "床旁护士Agent", "bed": 1, "kind": "observation", "content": "MAP 44.2 mmHg 低于目标 65：核对血管活性药通路/浓度，避免间断中断。", "refs": ["床旁护士Agent"]}
+{"ts": 1792994120.5, "agent": "检验Agent", "bed": 2, "kind": "observation", "content": "乳酸 3.8 mmol/L 偏高，建议 2-4h 复查动态趋势；结合 ScvO2 评估灌注。", "refs": ["检验Agent"]}
+{"ts": 1792994120.5, "agent": "微生物Agent", "bed": 1, "kind": "observation", "content": "血培养（模拟）：革兰阴性杆菌阳性，待药敏结果；经验覆盖建议参照本院耐药谱。", "refs": ["微生物Agent"]}
+{"ts": 1792994120.5, "agent": "影像Agent", "bed": 1, "kind": "observation", "content": "床旁超声（模拟）：下腔静脉变异度小、心室充盈可，提示容量反应性有限。", "refs": ["影像Agent"]}
